@@ -16,16 +16,23 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
+import com.exactpro.th2.validator.model.BoxesRelation;
 import com.exactpro.th2.validator.model.Th2LinkSpec;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.infrarepo.RepositoryResource;
 import com.exactpro.th2.infrarepo.ResourceType;
 import com.exactpro.th2.validator.util.SecretsUtils;
+import com.exactpro.th2.validator.util.SourceHashUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Secret;
+
 import java.util.*;
 
+import static com.exactpro.th2.validator.UrlPathConflicts.detectUrlPathsConflicts;
+import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
 import static com.exactpro.th2.validator.util.SecretsUtils.extractCustomConfig;
 import static com.exactpro.th2.validator.util.SecretsUtils.generateSecretsConfig;
 
@@ -34,27 +41,36 @@ public class SchemaValidator {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public static SchemaValidationContext validate(String schemaName,
+                                                   String namespacePrefix,
                                                    Map<String, Map<String, RepositoryResource>> repositoryMap) {
         SchemaValidationContext schemaValidationContext = new SchemaValidationContext();
-
         try {
+            detectUrlPathsConflicts(schemaValidationContext, collectAllBoxes(repositoryMap));
             validateLinks(schemaName, schemaValidationContext, repositoryMap);
-            validateSecrets(schemaName, schemaValidationContext, repositoryMap);
+            validateSecrets(schemaName, namespacePrefix, schemaValidationContext, repositoryMap);
         } catch (Exception e) {
-            schemaValidationContext.setException(e);
+            schemaValidationContext.addExceptionMessage(e.getMessage());
             return schemaValidationContext;
         }
         return schemaValidationContext;
     }
 
     private static void validateSecrets(String schemaName,
+                                        String namespacePrefix,
                                         SchemaValidationContext schemaValidationContext,
                                         Map<String, Map<String, RepositoryResource>> repositoryMap) {
         Map<String, RepositoryResource> boxes = repositoryMap.get(ResourceType.Th2Box.kind());
         Map<String, RepositoryResource> coreBoxes = repositoryMap.get(ResourceType.Th2CoreBox.kind());
+        String namespace =  namespacePrefix + schemaName;
         List<RepositoryResource> allBoxes = new ArrayList<>(boxes.values());
         allBoxes.addAll(coreBoxes.values());
-        Secret secret = SecretsUtils.getCustomSecret(schemaName);
+        Secret secret = SecretsUtils.getCustomSecret(namespace);
+        if (secret == null) {
+            String errorMessage = String.format("Secret \"secret-custom-config\" is not present in namespace: \"%s\"",
+                    namespace);
+            schemaValidationContext.addExceptionMessage(errorMessage);
+            return;
+        }
         Map<String, String> secretData = secret.getData();
         for (var res : allBoxes) {
             Map<String, Object> customConfig = extractCustomConfig(res);
@@ -63,10 +79,13 @@ public class SchemaValidator {
                 for (String secretKey : secretsConfig) {
                     if (secretData == null || !secretData.containsKey(secretKey)) {
                         String resName = res.getMetadata().getName();
-                        String errorMessage = String.format("Resource \"%s\" is invalid, value \"%s\" from " +
-                                "\"secret-custom-config\" is not present in Kubernetes", resName, secretKey);
+                        String errorMessage = String.format("Value \"%s\" from " +
+                                "\"secret-custom-config\" is not present in Kubernetes", secretKey);
                         schemaValidationContext.setInvalidResource(resName);
-                        schemaValidationContext.addSecretsErrorMessage(errorMessage);
+                        schemaValidationContext.addBoxResourceErrorMessages(new BoxResourceErrorMessage(
+                                resName,
+                                errorMessage
+                        ));
                     }
                 }
             }
@@ -101,14 +120,6 @@ public class SchemaValidator {
             for (DictionaryLink dictionaryLink : spec.getDictionariesRelation()) {
                 dictionaryLinkValidator.validateLink(linkRes, dictionaryLink);
             }
-//            schemaValidationContext.removeInvalidLinks(linkRes.getMetadata().getName(), spec);
-//            linkRes.setSpec(spec);
-//            try {
-//                String specStr = mapper.writeValueAsString(spec);
-//                linkRes.setSourceHash(SourceHashUtil.digest(specStr));
-//            } catch (JsonProcessingException e) {
-//                logger.error("Couldn't update source hash for \"{}\"", annotationFor(linkRes, schemaName));
-//            }
         }
     }
 
@@ -120,5 +131,26 @@ public class SchemaValidator {
         Map<String, RepositoryResource> allBoxes = new HashMap<>(boxes);
         allBoxes.putAll(coreBoxes);
         return allBoxes;
+    }
+
+    public static void removeInvalidLinks(SchemaValidationContext validationContext,
+                                   Map<String, RepositoryResource> linkResources) throws JsonProcessingException {
+        for (var entry : linkResources.entrySet()) {
+            RepositoryResource resource = entry.getValue();
+            String linkResName = entry.getKey();
+            Th2LinkSpec spec = mapper.convertValue(resource.getSpec(), Th2LinkSpec.class);
+            ResourceValidationContext resourceValidationContext = validationContext.getResource(linkResName);
+            if (resourceValidationContext == null || resourceValidationContext.getStatus().equals(VALID)) {
+                continue;
+            }
+            BoxesRelation boxesRelation = spec.getBoxesRelation();
+            boxesRelation.setMqLinks(resourceValidationContext.getValidMqLinks());
+            boxesRelation.setGrpcLinks(resourceValidationContext.getValidGrpcLinks());
+            spec.setDictionariesRelation(resourceValidationContext.getValidDictionaryLinks());
+            resource.setSpec(spec);
+
+            String specStr = mapper.writeValueAsString(spec);
+            resource.setSourceHash(SourceHashUtil.digest(specStr));
+        }
     }
 }

@@ -20,6 +20,7 @@ import com.exactpro.th2.validator.chain.impl.*;
 import com.exactpro.th2.validator.enums.BoxDirection;
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.exactpro.th2.validator.enums.ValidationResult;
+import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.infrarepo.RepositoryResource;
@@ -63,11 +64,16 @@ class MqLinkValidator extends BoxesLinkValidator {
             validate(fromContext, toContext, linkRes, link);
         } catch (Exception e) {
             String linkResName = linkRes.getMetadata().getName();
-            String message = String.format("Exception processing link: \"%s\" from resource \"%s\". %s",
-                    link.getName(), linkResName, e.getMessage());
-            var schemaValidationTable = schemaContext.getSchemaValidationContext();
-            schemaContext.getSchemaValidationContext().setInvalidResource(linkResName);
-            schemaValidationTable.addLinkErrorMessage(message);
+            var schemaValidationContext = schemaContext.getSchemaValidationContext();
+            schemaValidationContext.setInvalidResource(linkResName);
+            schemaValidationContext.addLinkErrorMessage(linkResName,
+                    new BoxLinkErrorMessage(
+                            link.getName(),
+                            null,
+                            null,
+                            String.format("Exception: %s", e.getMessage())
+                    )
+            );
         }
     }
 

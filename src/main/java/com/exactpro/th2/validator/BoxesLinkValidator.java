@@ -17,6 +17,7 @@
 package com.exactpro.th2.validator;
 
 import com.exactpro.th2.validator.enums.ValidationResult;
+import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.infrarepo.RepositoryResource;
@@ -52,20 +53,36 @@ abstract class BoxesLinkValidator {
             addValidMessageLink(linkResName, link);
             return;
         }
+        String fromBoxName = link.getFrom().getBox();
+        String toBoxName = link.getTo().getBox();
         //check if "from" resource is valid
         if (!fromResValidationResult.getValidationStatus().equals(VALID)) {
-            String message = format("link: \"%s\" from: \"%s\" is invalid and will be ignored. \"%s\" %s",
-                    link.getName(), linkResName, link.getFrom().getBox(), fromResValidationResult.getMessage());
+            String message = format("\"%s\" %s. link will be ignored.",
+                    fromBoxName, fromResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
             schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(message);
+            schemaValidationContext.addLinkErrorMessage(linkResName,
+                    new BoxLinkErrorMessage(
+                            link.getName(),
+                            fromBoxName,
+                            toBoxName,
+                            message
+                    )
+            );
         }
         if (!toResValidationResult.getValidationStatus().equals(VALID)) {
-            String message = format("link: \"%s\" from: \"%s\" is invalid and will be ignored. \"%s\" %s",
-                    link.getName(), linkResName, link.getTo().getBox(), toResValidationResult.getMessage());
+            String message = format("\"%s\" %s. link will be ignored.",
+                    toBoxName, toResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
             schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(message);
+            schemaValidationContext.addLinkErrorMessage(linkResName,
+                    new BoxLinkErrorMessage(
+                            link.getName(),
+                            fromBoxName,
+                            toBoxName,
+                            message
+                    )
+            );
         }
     }
 }

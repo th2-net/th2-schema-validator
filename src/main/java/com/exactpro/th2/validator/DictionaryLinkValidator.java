@@ -16,10 +16,9 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.validator.errormessages.DictionaryLinkErrorMessage;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.infrarepo.RepositoryResource;
-
-import static java.lang.String.format;
 
 public class DictionaryLinkValidator {
     private SchemaContext schemaContext;
@@ -42,18 +41,26 @@ public class DictionaryLinkValidator {
                     schemaValidationContext.addValidDictionaryLink(linkResName, link);
                     return;
                 }
-                String msg = format(
-                        "link: \"%s\" from: \"%s\" is invalid and will be ignored. Resource: \"%s\" doesn't exist",
-                        link.getName(), linkResName, link.getDictionary().getName()
-                );
                 schemaValidationContext.setInvalidResource(linkResName);
-                schemaValidationContext.addLinkErrorMessage(msg);
+                schemaValidationContext.addLinkErrorMessage(linkResName,
+                        new DictionaryLinkErrorMessage(
+                                link.getName(),
+                                boxName,
+                                dicName,
+                                "Dictionary doesn't exist"
+                        )
+                );
             }
         } catch (Exception e) {
-            String message = String.format("Exception processing link: \"%s\" from resource \"%s\". %s",
-                    link.getName(), linkResName, e.getMessage());
-            schemaContext.getSchemaValidationContext().setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(message);
+            schemaValidationContext.setInvalidResource(linkResName);
+            schemaValidationContext.addLinkErrorMessage(linkResName,
+                    new DictionaryLinkErrorMessage(
+                            link.getName(),
+                            null,
+                            null,
+                            String.format("Exception: %s", e.getMessage())
+                    )
+            );
         }
     }
 }

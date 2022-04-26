@@ -16,49 +16,44 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
+import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ValidationReport {
 
-    private List<String> linkErrorMessages = new ArrayList<>();
+    private Map<String, List<LinkErrorMessage>> linkErrorMessages = new HashMap<>();
 
-    private List<String> secretsErrorMessages = new ArrayList<>();
+    private List<BoxResourceErrorMessage> boxResourceErrorMessages = new ArrayList<>();
 
-    private Exception exception;
+    private List<String> exceptionMessages = new ArrayList<>();
 
-    private String commitRef;
-
-    public void addLinkErrorMessage(String message) {
-        this.linkErrorMessages.add(message);
+    public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {
+        this.linkErrorMessages.computeIfAbsent(linkResName, k -> new ArrayList<>()).add(linkErrorMessage);
     }
 
-    public void addSecretsErrorMessage(String message) {
-        this.secretsErrorMessages.add(message);
+    public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMessage) {
+        this.boxResourceErrorMessages.add(boxResourceErrorMessage);
     }
 
-    public List<String> getLinkErrorMessages() {
+    public Map<String, List<LinkErrorMessage>> getLinkErrorMessages() {
         return linkErrorMessages;
     }
 
-    public List<String> getSecretsErrorMessages() {
-        return secretsErrorMessages;
+    public List<BoxResourceErrorMessage> getBoxResourceErrorMessages() {
+        return boxResourceErrorMessages;
     }
 
-    public Exception getException() {
-        return exception;
+    public List<String> getExceptionMessages() {
+        return exceptionMessages;
     }
 
-    public String getCommitRef() {
-        return commitRef;
-    }
-
-    public void setException(Exception exception) {
-        this.exception = exception;
-    }
-
-    public void setCommitRef(String commitRef) {
-        this.commitRef = commitRef;
+    public void addExceptionMessage(String exceptionMessage) {
+        this.exceptionMessages.add(exceptionMessage);
     }
 }
 

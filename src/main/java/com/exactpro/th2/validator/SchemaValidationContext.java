@@ -16,15 +16,13 @@
 
 package com.exactpro.th2.validator;
 
-import com.exactpro.th2.validator.model.BoxesRelation;
-import com.exactpro.th2.validator.model.Th2LinkSpec;
+import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
+import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
 
 public class SchemaValidationContext {
 
@@ -47,8 +45,8 @@ public class SchemaValidationContext {
         this.valid = false;
     }
 
-    public void setException(Exception e) {
-        this.report.setException(e);
+    public void addExceptionMessage(String exceptionMessage) {
+        this.report.addExceptionMessage(exceptionMessage);
         this.valid = false;
     }
 
@@ -65,22 +63,15 @@ public class SchemaValidationContext {
                 .addValidDictionaryLink(dictionaryLink);
     }
 
-    public void addLinkErrorMessage(String message) {
-        report.addLinkErrorMessage(message);
+    public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {
+        report.addLinkErrorMessage(linkResName, linkErrorMessage);
     }
 
-    public void addSecretsErrorMessage(String message) {
-        report.addSecretsErrorMessage(message);
+    public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMessage) {
+        report.addBoxResourceErrorMessages(boxResourceErrorMessage);
     }
 
-    public void removeInvalidLinks(String linkResName, Th2LinkSpec spec) {
-        ResourceValidationContext resourceValidationContext = resources.get(linkResName);
-        if (resourceValidationContext == null || resourceValidationContext.getStatus().equals(VALID)) {
-            return;
-        }
-        BoxesRelation boxesRelation = spec.getBoxesRelation();
-        boxesRelation.setMqLinks(resourceValidationContext.getValidMqLinks());
-        boxesRelation.setGrpcLinks(resourceValidationContext.getValidGrpcLinks());
-        spec.setDictionariesRelation(resourceValidationContext.getValidDictionaryLinks());
+    public ResourceValidationContext getResource(String resName) {
+        return resources.get(resName);
     }
 }
