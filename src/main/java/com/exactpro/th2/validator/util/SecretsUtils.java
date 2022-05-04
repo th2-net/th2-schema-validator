@@ -42,7 +42,7 @@ public class SecretsUtils {
 
     public static boolean namespaceNotPresent(String namespace) {
         KubernetesClient kubernetesClient = new DefaultKubernetesClient();
-        return kubernetesClient.namespaces().withName(namespace) == null;
+        return kubernetesClient.namespaces().withName(namespace).get() == null;
     }
 
     public static Map<String, Object> extractCustomConfig(RepositoryResource resource) {
