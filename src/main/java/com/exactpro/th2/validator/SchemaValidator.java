@@ -61,9 +61,12 @@ public class SchemaValidator {
                                         Map<String, Map<String, RepositoryResource>> repositoryMap) {
         Map<String, RepositoryResource> boxes = repositoryMap.get(ResourceType.Th2Box.kind());
         Map<String, RepositoryResource> coreBoxes = repositoryMap.get(ResourceType.Th2CoreBox.kind());
-        String namespace =  namespacePrefix + schemaName;
+        String namespace = namespacePrefix + schemaName;
         List<RepositoryResource> allBoxes = new ArrayList<>(boxes.values());
         allBoxes.addAll(coreBoxes.values());
+        if (SecretsUtils.namespaceNotPresent(namespace)) {
+            return;
+        }
         Secret secret = SecretsUtils.getCustomSecret(namespace);
         if (secret == null) {
             String errorMessage = String.format("Secret \"secret-custom-config\" is not present in namespace: \"%s\"",
@@ -134,7 +137,8 @@ public class SchemaValidator {
     }
 
     public static void removeInvalidLinks(SchemaValidationContext validationContext,
-                                   Map<String, RepositoryResource> linkResources) throws JsonProcessingException {
+                                          Map<String, RepositoryResource> linkResources)
+            throws JsonProcessingException {
         for (var entry : linkResources.entrySet()) {
             RepositoryResource resource = entry.getValue();
             String linkResName = entry.getKey();

@@ -40,6 +40,11 @@ public class SecretsUtils {
                 .withName(DEFAULT_SECRET_NAME).get();
     }
 
+    public static boolean namespaceNotPresent(String namespace) {
+        KubernetesClient kubernetesClient = new DefaultKubernetesClient();
+        return kubernetesClient.namespaces().withName(namespace) == null;
+    }
+
     public static Map<String, Object> extractCustomConfig(RepositoryResource resource) {
         String customConfigAlias = "custom-config";
         Map<String, Object> spec = (Map<String, Object>) resource.getSpec();
