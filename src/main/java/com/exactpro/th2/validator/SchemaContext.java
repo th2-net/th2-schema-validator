@@ -30,7 +30,7 @@ public class SchemaContext {
 
     private final Map<String, RepositoryResource> dictionaries;
 
-    private SchemaValidationContext schemaValidationContext;
+    private final SchemaValidationContext schemaValidationContext;
 
     public SchemaContext(String schemaName,
                          Map<String, RepositoryResource> allBoxes,
@@ -60,7 +60,7 @@ public class SchemaContext {
 
     private static class ResourcesList {
 
-        private ValidationResult result = ValidationResult.valid();
+        private final ValidationResult result = ValidationResult.valid();
 
         private final ArrayList<RepositoryResource> linkedResources = new ArrayList<>();
     }

@@ -19,6 +19,7 @@ package com.exactpro.th2.validator;
 import com.exactpro.th2.validator.enums.ValidationStatus;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
+import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class ResourceValidationContext {
     private final List<MessageLink> validGrpcLinks = new ArrayList<>();
 
     private final List<DictionaryLink> validDictionaryLinks = new ArrayList<>();
+
+    private final List<MultiDictionaryLink> validMultiDictionaryLinks = new ArrayList<>();
 
     public void setInvalid() {
         this.status = ValidationStatus.INVALID;
@@ -49,6 +52,10 @@ public class ResourceValidationContext {
         this.validDictionaryLinks.add(link);
     }
 
+    public void addValidMultiDictionaryLink(MultiDictionaryLink link) {
+        this.validMultiDictionaryLinks.add(link);
+    }
+
     public List<MessageLink> getValidMqLinks() {
         return validMqLinks;
     }
@@ -59,6 +66,10 @@ public class ResourceValidationContext {
 
     public List<DictionaryLink> getValidDictionaryLinks() {
         return validDictionaryLinks;
+    }
+
+    public List<MultiDictionaryLink> getValidMultiDictionaryLinks() {
+        return validMultiDictionaryLinks;
     }
 
     public ValidationStatus getStatus() {

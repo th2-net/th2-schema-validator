@@ -18,9 +18,9 @@ package com.exactpro.th2.validator.enums;
 
 public class ValidationResult {
 
-    private String message;
+    private final String message;
 
-    private ValidationStatus validationStatus;
+    private final ValidationStatus validationStatus;
 
     public static ValidationResult invalid(String message) {
         return new ValidationResult(message, ValidationStatus.INVALID);

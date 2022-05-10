@@ -24,9 +24,13 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class Th2Spec {
 
-    protected String type;
+    private String type;
 
-    protected List<PinSpec> pins = new ArrayList<>();
+    private final List<PinSpec> pins = new ArrayList<>();
+
+    public String getType() {
+        return type;
+    }
 
     public List<PinSpec> getPins() {
         return pins;

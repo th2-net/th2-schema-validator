@@ -23,6 +23,7 @@ import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.infrarepo.RepositoryResource;
 import com.exactpro.th2.infrarepo.ResourceType;
+import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 import com.exactpro.th2.validator.util.SecretsUtils;
 import com.exactpro.th2.validator.util.SourceHashUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -108,9 +109,10 @@ public class SchemaValidator {
                 schemaValidationContext
         );
 
-        MqLinkValidator mqLinkValidator = new MqLinkValidator(schemaContext);
-        GrpcLinkValidator grpcLinkValidator = new GrpcLinkValidator(schemaContext);
-        DictionaryLinkValidator dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
+        var mqLinkValidator = new MqLinkValidator(schemaContext);
+        var grpcLinkValidator = new GrpcLinkValidator(schemaContext);
+        var dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
+        var multiDictionaryLinkValidator = new MultiDictionaryLinkValidator(schemaContext);
 
         for (RepositoryResource linkRes : links) {
             Th2LinkSpec spec = mapper.convertValue(linkRes.getSpec(), Th2LinkSpec.class);
@@ -122,6 +124,9 @@ public class SchemaValidator {
             }
             for (DictionaryLink dictionaryLink : spec.getDictionariesRelation()) {
                 dictionaryLinkValidator.validateLink(linkRes, dictionaryLink);
+            }
+            for (MultiDictionaryLink multiDictionaryLink : spec.getMultiDictionaryRelation()) {
+                multiDictionaryLinkValidator.validateLink(linkRes, multiDictionaryLink);
             }
         }
     }
