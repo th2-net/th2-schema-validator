@@ -32,12 +32,12 @@ public class DictionaryLinkValidator {
         SchemaValidationContext schemaValidationContext = schemaContext.getSchemaValidationContext();
         try {
             String boxName = link.getBox();
-            String dicName = link.getDictionary().getName();
+            String dictionaryName = link.getDictionary().getName();
             RepositoryResource boxResource = schemaContext.getBox(boxName);
             //First check if box is present
             if (boxResource != null) {
                 //if box is present validate that required dictionary also exists
-                if (schemaContext.getDictionary(dicName) != null) {
+                if (schemaContext.getDictionary(dictionaryName) != null) {
                     schemaValidationContext.addValidDictionaryLink(linkResName, link);
                     return;
                 }
@@ -46,8 +46,18 @@ public class DictionaryLinkValidator {
                         new DictionaryLinkErrorMessage(
                                 link.getName(),
                                 boxName,
-                                dicName,
-                                "Dictionary doesn't exist"
+                                dictionaryName,
+                                String.format("Dictionary '%s' doesn't exist", dictionaryName)
+                        )
+                );
+            } else {
+                schemaValidationContext.setInvalidResource(linkResName);
+                schemaValidationContext.addLinkErrorMessage(linkResName,
+                        new DictionaryLinkErrorMessage(
+                                link.getName(),
+                                boxName,
+                                dictionaryName,
+                                String.format("Resource '%s' doesn't exist", boxName)
                         )
                 );
             }

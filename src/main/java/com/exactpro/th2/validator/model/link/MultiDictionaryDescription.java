@@ -16,40 +16,16 @@
 
 package com.exactpro.th2.validator.model.link;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public final class MultiDictionaryDescription {
+    private String name;
 
-    private final List<SingleDictionaryDescription> dicts = new ArrayList<>();
+    private String alias;
 
-    public List<String> dictNames() {
-        return dicts.stream().map(dict -> dict.getName()).collect(Collectors.toList());
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        throw new AssertionError("method not defined");
+    public String getAlias() {
+        return alias;
     }
-
-    @Override
-    public int hashCode() {
-        throw new AssertionError("method not defined");
-    }
-
-    public static final class SingleDictionaryDescription {
-        private String name;
-
-        private String alias;
-
-        public String getName() {
-            return name;
-        }
-
-        public String getAlias() {
-            return alias;
-        }
-    }
-
 }
