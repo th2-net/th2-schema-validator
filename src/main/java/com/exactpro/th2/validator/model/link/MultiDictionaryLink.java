@@ -16,13 +16,20 @@
 
 package com.exactpro.th2.validator.model.link;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public final class MultiDictionaryLink {
 
     private String name;
 
     private String box;
 
-    private MultiDictionaryDescription dictionaries;
+    private List<MultiDictionaryDescription> dictionaries;
+
+    public List<String> getDictionaryNames() {
+        return dictionaries.stream().map(MultiDictionaryDescription::getName).collect(Collectors.toList());
+    }
 
     public String getName() {
         return name;
@@ -32,7 +39,7 @@ public final class MultiDictionaryLink {
         return box;
     }
 
-    public MultiDictionaryDescription getDictionaries() {
+    public List<MultiDictionaryDescription> getDictionaries() {
         return dictionaries;
     }
 

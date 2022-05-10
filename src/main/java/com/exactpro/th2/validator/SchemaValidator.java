@@ -156,6 +156,7 @@ public class SchemaValidator {
             boxesRelation.setMqLinks(resourceValidationContext.getValidMqLinks());
             boxesRelation.setGrpcLinks(resourceValidationContext.getValidGrpcLinks());
             spec.setDictionariesRelation(resourceValidationContext.getValidDictionaryLinks());
+            spec.setMultiDictionaryRelation(resourceValidationContext.getValidMultiDictionaryLinks());
             resource.setSpec(spec);
 
             String specStr = mapper.writeValueAsString(spec);

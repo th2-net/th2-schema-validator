@@ -32,25 +32,35 @@ public class MultiDictionaryLinkValidator {
         SchemaValidationContext schemaValidationContext = schemaContext.getSchemaValidationContext();
         try {
             String boxName = link.getBox();
-            for (var dictName : link.getDictionaries().dictNames()) {
-                RepositoryResource boxResource = schemaContext.getBox(boxName);
-                //First check if box is present
-                if (boxResource != null) {
+            RepositoryResource boxResource = schemaContext.getBox(boxName);
+            //First check if box is present
+            if (boxResource != null) {
+                for (var dictionaryName : link.getDictionaryNames()) {
                     //if box is present validate that required dictionary also exists
-                    if (schemaContext.getDictionary(dictName) != null) {
+                    if (schemaContext.getDictionary(dictionaryName) != null) {
                         schemaValidationContext.addValidMultiDictionaryLink(linkResName, link);
-                        return;
+                    } else {
+                        schemaValidationContext.setInvalidResource(linkResName);
+                        schemaValidationContext.addLinkErrorMessage(linkResName,
+                                new DictionaryLinkErrorMessage(
+                                        link.getName(),
+                                        boxName,
+                                        dictionaryName,
+                                        String.format("Dictionary '%s' doesn't exist", dictionaryName)
+                                )
+                        );
                     }
-                    schemaValidationContext.setInvalidResource(linkResName);
-                    schemaValidationContext.addLinkErrorMessage(linkResName,
-                            new DictionaryLinkErrorMessage(
-                                    link.getName(),
-                                    boxName,
-                                    dictName,
-                                    "Dictionary doesn't exist"
-                            )
-                    );
                 }
+            } else {
+                schemaValidationContext.setInvalidResource(linkResName);
+                schemaValidationContext.addLinkErrorMessage(linkResName,
+                        new DictionaryLinkErrorMessage(
+                                link.getName(),
+                                boxName,
+                                link.getDictionaryNames().toString(),
+                                String.format("Resource '%s' doesn't exist", boxName)
+                        )
+                );
             }
         } catch (Exception e) {
             schemaValidationContext.setInvalidResource(linkResName);
