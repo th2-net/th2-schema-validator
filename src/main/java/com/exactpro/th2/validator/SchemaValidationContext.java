@@ -20,6 +20,7 @@ import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
+import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,9 +29,9 @@ public class SchemaValidationContext {
 
     private boolean valid = true;
 
-    private Map<String, ResourceValidationContext> resources = new HashMap<>();
+    private final Map<String, ResourceValidationContext> resources = new HashMap<>();
 
-    private ValidationReport report = new ValidationReport();
+    private final ValidationReport report = new ValidationReport();
 
     public boolean isValid() {
         return valid;
@@ -61,6 +62,11 @@ public class SchemaValidationContext {
     public void addValidDictionaryLink(String resourceName, DictionaryLink dictionaryLink) {
         this.resources.computeIfAbsent(resourceName, k -> new ResourceValidationContext())
                 .addValidDictionaryLink(dictionaryLink);
+    }
+
+    public void addValidMultiDictionaryLink(String resourceName, MultiDictionaryLink multiDictionaryLink) {
+        this.resources.computeIfAbsent(resourceName, k -> new ResourceValidationContext())
+                .addValidMultiDictionaryLink(multiDictionaryLink);
     }
 
     public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {

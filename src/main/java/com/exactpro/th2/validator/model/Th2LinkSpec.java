@@ -17,6 +17,7 @@
 package com.exactpro.th2.validator.model;
 
 import com.exactpro.th2.validator.model.link.DictionaryLink;
+import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,6 +33,9 @@ public final class Th2LinkSpec {
     @JsonProperty("dictionaries-relation")
     private List<DictionaryLink> dictionariesRelation = new ArrayList<>();
 
+    @JsonProperty("multi-dictionaries-relation")
+    private List<MultiDictionaryLink> multiDictionaryRelation = new ArrayList<>();
+
     public BoxesRelation getBoxesRelation() {
         return this.boxesRelation;
     }
@@ -44,6 +48,14 @@ public final class Th2LinkSpec {
         if (dictionariesRelation != null) {
             this.dictionariesRelation = dictionariesRelation;
         }
+    }
+
+    public List<MultiDictionaryLink> getMultiDictionaryRelation() {
+        return this.multiDictionaryRelation;
+    }
+
+    public void setMultiDictionaryRelation(List<MultiDictionaryLink> multiDictionaryRelation) {
+        this.multiDictionaryRelation = multiDictionaryRelation;
     }
 
     public void setBoxesRelation(BoxesRelation boxesRelation) {

@@ -18,9 +18,9 @@ package com.exactpro.th2.validator.errormessages;
 
 public class DictionaryLinkErrorMessage extends LinkErrorMessage {
 
-    private String box;
+    private final String box;
 
-    private String dictionary;
+    private final String dictionary;
 
     public DictionaryLinkErrorMessage(String linkName, String box, String dictionary, String message) {
         super(linkName, message);
