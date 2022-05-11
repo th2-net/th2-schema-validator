@@ -35,11 +35,11 @@ public class MultiDictionaryLinkValidator {
             RepositoryResource boxResource = schemaContext.getBox(boxName);
             //First check if box is present
             if (boxResource != null) {
+                boolean valid = true;
                 for (var dictionaryName : link.getDictionaryNames()) {
                     //if box is present validate that required dictionary also exists
-                    if (schemaContext.getDictionary(dictionaryName) != null) {
-                        schemaValidationContext.addValidMultiDictionaryLink(linkResName, link);
-                    } else {
+                    if (schemaContext.getDictionary(dictionaryName) == null) {
+                        valid = false;
                         schemaValidationContext.setInvalidResource(linkResName);
                         schemaValidationContext.addLinkErrorMessage(linkResName,
                                 new DictionaryLinkErrorMessage(
@@ -49,7 +49,11 @@ public class MultiDictionaryLinkValidator {
                                         String.format("Dictionary '%s' doesn't exist", dictionaryName)
                                 )
                         );
+                        break;
                     }
+                }
+                if (valid) {
+                    schemaValidationContext.addValidMultiDictionaryLink(linkResName, link);
                 }
             } else {
                 schemaValidationContext.setInvalidResource(linkResName);
