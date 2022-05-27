@@ -18,7 +18,6 @@ package com.exactpro.th2.validator.model;
 
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,15 +29,12 @@ public final class PinSpec {
 
     private String name;
 
-    @JsonProperty("connection-type")
     private SchemaConnectionType connectionType;
 
     private List<String> attributes = new ArrayList<>();
 
-    @JsonProperty("service-classes")
     private Set<String> serviceClasses = new HashSet<>();
 
-    @JsonProperty("service-class")
     private String serviceClass;
 
     public String getName() {
