@@ -24,10 +24,10 @@ import java.util.List;
 
 public final class BoxesRelation {
 
-    @JsonProperty("router-mq")
+    @JsonProperty("routerMq")
     private List<MessageLink> mqLinks = new ArrayList<>();
 
-    @JsonProperty("router-grpc")
+    @JsonProperty("routerGrpc")
     private List<MessageLink> grpcLinks = new ArrayList<>();
 
     public List<MessageLink> getRouterMq() {
