@@ -153,8 +153,8 @@ public class SchemaValidator {
                 continue;
             }
             BoxesRelation boxesRelation = spec.getBoxesRelation();
-            boxesRelation.setMqLinks(resourceValidationContext.getValidMqLinks());
-            boxesRelation.setGrpcLinks(resourceValidationContext.getValidGrpcLinks());
+            boxesRelation.setRouterMq(resourceValidationContext.getValidMqLinks());
+            boxesRelation.setRouterGrpc(resourceValidationContext.getValidGrpcLinks());
             spec.setDictionariesRelation(resourceValidationContext.getValidDictionaryLinks());
             spec.setMultiDictionaryRelation(resourceValidationContext.getValidMultiDictionaryLinks());
             resource.setSpec(spec);

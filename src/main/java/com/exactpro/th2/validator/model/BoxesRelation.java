@@ -17,36 +17,33 @@
 package com.exactpro.th2.validator.model;
 
 import com.exactpro.th2.validator.model.link.MessageLink;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class BoxesRelation {
 
-    @JsonProperty("routerMq")
-    private List<MessageLink> mqLinks = new ArrayList<>();
+    private List<MessageLink> routerMq = new ArrayList<>();
 
-    @JsonProperty("routerGrpc")
-    private List<MessageLink> grpcLinks = new ArrayList<>();
+    private List<MessageLink> routerGrpc = new ArrayList<>();
 
     public List<MessageLink> getRouterMq() {
-        return this.mqLinks;
+        return this.routerMq;
     }
 
     public List<MessageLink> getRouterGrpc() {
-        return this.grpcLinks;
+        return this.routerGrpc;
     }
 
-    public void setMqLinks(List<MessageLink> mqLinks) {
-        if (mqLinks != null) {
-            this.mqLinks = mqLinks;
+    public void setRouterMq(List<MessageLink> routerMq) {
+        if (routerMq != null) {
+            this.routerMq = routerMq;
         }
     }
 
-    public void setGrpcLinks(List<MessageLink> grpcLinks) {
-        if (grpcLinks != null) {
-            this.grpcLinks = grpcLinks;
+    public void setRouterGrpc(List<MessageLink> routerGrpc) {
+        if (routerGrpc != null) {
+            this.routerGrpc = routerGrpc;
         }
     }
 

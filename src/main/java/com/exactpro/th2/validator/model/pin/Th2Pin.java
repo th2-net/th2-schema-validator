@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.enums;
+package com.exactpro.th2.validator.model.pin;
 
-public enum SchemaConnectionType {
-    mq,
-    grpc_server,
-    grpc_client
+public interface Th2Pin {
+    String getName();
 }

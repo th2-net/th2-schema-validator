@@ -19,10 +19,10 @@ package com.exactpro.th2.validator.chain.impl;
 import com.exactpro.th2.validator.chain.AbstractValidator;
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.exactpro.th2.validator.enums.ValidationResult;
-import com.exactpro.th2.validator.model.BoxLinkContext;
-import com.exactpro.th2.validator.model.PinSpec;
-import com.exactpro.th2.validator.model.Th2Spec;
+import com.exactpro.th2.validator.model.*;
 import com.exactpro.th2.infrarepo.RepositoryResource;
+import com.exactpro.th2.validator.model.pin.GrpcClientPin;
+import com.exactpro.th2.validator.model.pin.GrpcServerPin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Set;
@@ -58,7 +58,7 @@ public final class ExpectedServiceClass extends AbstractValidator {
 
         ObjectMapper mapper = new ObjectMapper();
         Th2Spec linkedResSpec = mapper.convertValue(linkedResource.getSpec(), Th2Spec.class);
-        PinSpec linkedPin = linkedResSpec.getPin(linkedPinName);
+        GrpcServerPin linkedPin = linkedResSpec.getGrpcServerPin(linkedPinName);
 
         if (linkedPin == null) {
             return ValidationResult.invalid(format("Linked pin: [%s] does not exist", linkedPinName));
@@ -73,7 +73,7 @@ public final class ExpectedServiceClass extends AbstractValidator {
             );
         }
 
-        var pin = (PinSpec) object;
+        var pin = (GrpcClientPin) object;
         if (serviceClasses.contains(pin.getServiceClass())) {
             return super.validate(object, additional);
         }

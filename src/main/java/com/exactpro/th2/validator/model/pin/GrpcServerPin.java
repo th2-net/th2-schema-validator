@@ -14,46 +14,25 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.model;
+package com.exactpro.th2.validator.model.pin;
 
-import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class PinSpec {
-
+public class GrpcServerPin implements Th2Pin {
     private String name;
 
-    private SchemaConnectionType connectionType;
+    private final Set<String> serviceClasses = new HashSet<>();
 
-    private List<String> attributes = new ArrayList<>();
-
-    private Set<String> serviceClasses = new HashSet<>();
-
-    private String serviceClass;
-
+    @Override
     public String getName() {
         return name;
     }
 
-    public SchemaConnectionType getConnectionType() {
-        return connectionType;
-    }
-
-    public List<String> getAttributes() {
-        return attributes;
-    }
-
     public Set<String> getServiceClasses() {
         return serviceClasses;
-    }
-
-    public String getServiceClass() {
-        return serviceClass;
     }
 }

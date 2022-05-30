@@ -20,7 +20,7 @@ import com.exactpro.th2.validator.chain.AbstractValidator;
 import com.exactpro.th2.validator.enums.BoxDirection;
 import com.exactpro.th2.validator.enums.ValidationResult;
 import com.exactpro.th2.validator.model.BoxLinkContext;
-import com.exactpro.th2.validator.model.PinSpec;
+import com.exactpro.th2.validator.model.pin.MqPin;
 
 import static com.exactpro.th2.validator.enums.DirectionAttribute.publish;
 import static com.exactpro.th2.validator.enums.DirectionAttribute.subscribe;
@@ -36,10 +36,10 @@ public final class ExpectedDirectionalAttr extends AbstractValidator {
 
     @Override
     public ValidationResult validate(Object object, Object... additional) {
-        if (!(object instanceof PinSpec)) {
+        if (!(object instanceof MqPin)) {
             throw new IllegalStateException("Expected target of type PinSpec");
         }
-        var pin = (PinSpec) object;
+        var pin = (MqPin) object;
         switch (boxDirection) {
             case to:
                 if (pin.getAttributes().contains(publish.name())) {
