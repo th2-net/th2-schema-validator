@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.enums;
+package com.exactpro.th2.validator.model.pin;
 
-public enum SchemaConnectionType {
-    mq,
-    grpc_server,
-    grpc_client
+import java.util.ArrayList;
+import java.util.List;
+
+public class GrpcSection {
+    private List<GrpcClientPin> client = new ArrayList<>();
+
+    private List<GrpcServerPin> server = new ArrayList<>();
+
+    public List<GrpcClientPin> getClient() {
+        return client;
+    }
+
+    public List<GrpcServerPin> getServer() {
+        return server;
+    }
 }

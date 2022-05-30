@@ -16,7 +16,6 @@
 
 package com.exactpro.th2.validator;
 
-import com.exactpro.th2.validator.chain.impl.ExpectedConnectionType;
 import com.exactpro.th2.validator.chain.impl.ExpectedServiceClass;
 import com.exactpro.th2.validator.chain.impl.PinExist;
 import com.exactpro.th2.validator.chain.impl.ResourceExists;
@@ -88,12 +87,10 @@ class GrpcLinkValidator extends BoxesLinkValidator {
                                        BoxLinkContext context) {
         var resValidator = new ResourceExists();
         var pinExist = new PinExist(context);
-        var expectedPin = new ExpectedConnectionType(context);
         var expectedServiceClass = new ExpectedServiceClass(context);
 
         resValidator.setNext(pinExist);
-        pinExist.setNext(expectedPin);
-        expectedPin.setNext(expectedServiceClass);
+        pinExist.setNext(expectedServiceClass);
 
         return resValidator.validate(resource);
     }

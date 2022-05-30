@@ -88,7 +88,6 @@ class MqLinkValidator extends BoxesLinkValidator {
                                        BoxLinkContext context) {
         var resValidator = new ResourceExists();
         var pinExist = new PinExist(context);
-        var expectedPinType = new ExpectedConnectionType(context);
         var expectedPinAttr = new ExpectedDirectionalAttr(context);
         var expectedRawAttr = new ExpectedRawMessageAttr(context);
         var expectedParsedAttr = new ExpectedParsedMessageAttr(context);
@@ -96,8 +95,7 @@ class MqLinkValidator extends BoxesLinkValidator {
 
 
         resValidator.setNext(pinExist);
-        pinExist.setNext(expectedPinType);
-        expectedPinType.setNext(expectedPinAttr);
+        pinExist.setNext(expectedPinAttr);
         expectedPinAttr.setNext(expectedRawAttr);
         expectedRawAttr.setNext(expectedParsedAttr);
         expectedParsedAttr.setNext(expectedGroupAttr);

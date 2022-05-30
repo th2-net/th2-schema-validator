@@ -14,10 +14,31 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.enums;
+package com.exactpro.th2.validator.model.pin;
 
-public enum SchemaConnectionType {
-    mq,
-    grpc_server,
-    grpc_client
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GrpcClientPin implements Th2Pin {
+    private String name;
+
+    private List<String> attributes = new ArrayList<>();
+
+    private String serviceClass;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getAttributes() {
+        return attributes;
+    }
+
+    public String getServiceClass() {
+        return serviceClass;
+    }
 }

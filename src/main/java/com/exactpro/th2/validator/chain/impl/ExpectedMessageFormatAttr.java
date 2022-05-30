@@ -19,7 +19,7 @@ package com.exactpro.th2.validator.chain.impl;
 import com.exactpro.th2.validator.chain.AbstractValidator;
 import com.exactpro.th2.validator.enums.ValidationResult;
 import com.exactpro.th2.validator.model.BoxLinkContext;
-import com.exactpro.th2.validator.model.PinSpec;
+import com.exactpro.th2.validator.model.pin.MqPin;
 import com.exactpro.th2.validator.model.Th2Spec;
 import com.exactpro.th2.infrarepo.RepositoryResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,10 +63,10 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
 
     @Override
     public ValidationResult validate(Object object, Object... additional) {
-        if (!(object instanceof PinSpec)) {
+        if (!(object instanceof MqPin)) {
             throw new IllegalStateException("Expected target of type PinSpec");
         }
-        var pin = (PinSpec) object;
+        var pin = (MqPin) object;
         String pinName = pin.getName();
         List<String> attributesFilteredList = pin.getAttributes()
                 .stream()
@@ -101,7 +101,7 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
         //step 2: check if linked pin contains matching attributes
         ObjectMapper mapper = new ObjectMapper();
         Th2Spec linkedResSpec = mapper.convertValue(linkedResource.getSpec(), Th2Spec.class);
-        PinSpec linkedPin = linkedResSpec.getPin(linkedPinName);
+        MqPin linkedPin = linkedResSpec.getMqPin(linkedPinName);
         var oppositePinResult = oppositePinAttributeMatch(linkedPin, exactAttribute, otherMatchingAttributePrefixes);
         if (!oppositePinResult.getValidationStatus().equals(VALID)) {
             return oppositePinResult;
@@ -109,7 +109,7 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
         return super.validate(pin, additional);
     }
 
-    protected ValidationResult checkContradictingAttributes(PinSpec pin, List<String> excludedAttributePrefixes) {
+    protected ValidationResult checkContradictingAttributes(MqPin pin, List<String> excludedAttributePrefixes) {
         for (String excludedPrefix : excludedAttributePrefixes) {
             var contradictingAttributes = pin.getAttributes()
                     .stream()
@@ -123,7 +123,7 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
         return ValidationResult.valid();
     }
 
-    protected ValidationResult oppositePinAttributeMatch(PinSpec linkedPin,
+    protected ValidationResult oppositePinAttributeMatch(MqPin linkedPin,
                                                          String exactAttribute,
                                                          List<String> otherMatchingAttributePrefixes) {
         if (linkedPin == null) {
