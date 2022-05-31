@@ -16,10 +16,12 @@
 
 package com.exactpro.th2.validator.model.link;
 
+import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
+import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class MessageLink {
+public final class MessageLink implements IdentifiableLink {
 
     private String name;
 
@@ -29,6 +31,23 @@ public final class MessageLink {
 
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public String getContent() {
+        return String.format("%s[%s:%s-%s:%s]", this.getClass().getSimpleName(),
+                from.getBox(), from.getPin(),
+                to.getBox(), to.getPin());
+    }
+
+    @Override
+    public LinkErrorMessage errorMessage(String message) {
+        return new BoxLinkErrorMessage(
+                getName(),
+                from.getBox(),
+                to.getBox(),
+                message
+        );
     }
 
     public Endpoint getFrom() {

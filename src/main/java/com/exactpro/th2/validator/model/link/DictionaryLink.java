@@ -16,10 +16,12 @@
 
 package com.exactpro.th2.validator.model.link;
 
+import com.exactpro.th2.validator.errormessages.DictionaryLinkErrorMessage;
+import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class DictionaryLink {
+public final class DictionaryLink implements IdentifiableLink {
 
     private String name;
 
@@ -29,6 +31,24 @@ public final class DictionaryLink {
 
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public String getContent() {
+        return String.format("%s[%s:%s]",
+                this.getClass().getSimpleName(),
+                this.box,
+                this.dictionary == null ? "null" : this.dictionary.getName());
+    }
+
+    @Override
+    public LinkErrorMessage errorMessage(String message) {
+        return new DictionaryLinkErrorMessage(
+                getName(),
+                getBox(),
+                dictionary.getName(),
+                message
+        );
     }
 
     public String getBox() {

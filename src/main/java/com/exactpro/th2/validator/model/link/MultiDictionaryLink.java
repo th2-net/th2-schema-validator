@@ -16,10 +16,13 @@
 
 package com.exactpro.th2.validator.model.link;
 
+import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
+import com.exactpro.th2.validator.errormessages.MultiDictionaryLinkErrorMessage;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class MultiDictionaryLink {
+public final class MultiDictionaryLink implements IdentifiableLink {
 
     private String name;
 
@@ -33,6 +36,24 @@ public final class MultiDictionaryLink {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getContent() {
+        return String.format("%s[%s:%s]",
+                this.getClass().getSimpleName(),
+                this.box,
+                this.dictionaries == null ? "null" : dictionaries.toString());
+    }
+
+    @Override
+    public LinkErrorMessage errorMessage(String message) {
+        return new MultiDictionaryLinkErrorMessage(
+                getName(),
+                getBox(),
+                getDictionaryNames(),
+                message
+        );
     }
 
     public String getBox() {
