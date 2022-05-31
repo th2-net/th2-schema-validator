@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,22 @@
 
 package com.exactpro.th2.validator.errormessages;
 
-public class BoxLinkErrorMessage extends LinkErrorMessage {
+import java.util.List;
 
-    private final String from;
+public class MultiDictionaryLinkErrorMessage extends LinkErrorMessage {
+    private final String box;
 
-    private final String to;
+    private final List<String> dictionaryNames;
 
-    public BoxLinkErrorMessage(String linkName, String from, String to, String message) {
+    public MultiDictionaryLinkErrorMessage(String linkName, String box, List<String> dictionaryNames, String message) {
         super(linkName, message);
-        this.from = from;
-        this.to = to;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public String getTo() {
-        return to;
+        this.box = box;
+        this.dictionaryNames = dictionaryNames;
     }
 
     @Override
     public String toPrintableMessage() {
-        return String.format("link: \"%s\" [from: %s]-[to: %s] is invalid. %s",
-                getLinkName(), from, to, getMessage());
+        return String.format("link: \"%s\" [box: %s] - [dictionaries: %s] is invalid. %s",
+                getLinkName(), box, dictionaryNames, getMessage());
     }
 }

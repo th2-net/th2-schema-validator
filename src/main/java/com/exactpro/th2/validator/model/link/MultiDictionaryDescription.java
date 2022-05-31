@@ -28,4 +28,12 @@ public final class MultiDictionaryDescription {
     public String getAlias() {
         return alias;
     }
+
+    @Override
+    public String toString() {
+        return "MultiDictionaryDescription{" +
+                "name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
+                '}';
+    }
 }

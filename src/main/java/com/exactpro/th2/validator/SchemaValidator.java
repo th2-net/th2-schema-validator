@@ -21,6 +21,7 @@ import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import com.exactpro.th2.validator.model.BoxesRelation;
 import com.exactpro.th2.validator.model.Th2LinkSpec;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
+import com.exactpro.th2.validator.model.link.IdentifiableLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.infrarepo.ResourceType;
 import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
@@ -47,6 +48,7 @@ public class SchemaValidator {
         SchemaValidationContext schemaValidationContext = new SchemaValidationContext();
         try {
             detectUrlPathsConflicts(schemaValidationContext, collectAllBoxes(repositoryMap));
+
             validateLinks(schemaName, schemaValidationContext, repositoryMap);
             validateSecrets(schemaName, namespacePrefix, schemaValidationContext, repositoryMap);
         } catch (Exception e) {
@@ -96,6 +98,69 @@ public class SchemaValidator {
         }
     }
 
+    private static <T extends IdentifiableLink> List<T> distinctLinks(
+            List<T> links, SchemaValidationContext schemaValidationContext) {
+        Set<String> linkNames = new HashSet<>();
+        Set<String> linkContents = new HashSet<>();
+        List<T> distinctLinks = new ArrayList<>();
+        for (var link : links) {
+            boolean sameName = !linkNames.add(link.getName());
+            boolean sameContent = !linkContents.add(link.getContent());
+            if (sameName && sameContent) {
+                schemaValidationContext.addLinkErrorMessage(link.getName(), link.errorMessage(
+                        "Link has the same name and same content as the other link(s). Removing"));
+
+            } else if (sameName) {
+                schemaValidationContext.addLinkErrorMessage(link.getName(), link.errorMessage(
+                        "Link has the same name as the other link(s) but different content"
+                ));
+                distinctLinks.add(link);
+            } else if (sameContent) {
+                schemaValidationContext.addLinkErrorMessage(link.getName(), link.errorMessage(
+                        "Link has the same content as other link(s) but different name. Removing"));
+            } else {
+                distinctLinks.add(link);
+            }
+        }
+
+        return distinctLinks;
+    }
+
+    private static void removeDuplicateLinks(Th2LinkSpec spec, SchemaValidationContext schemaValidationContext) {
+        spec.getBoxesRelation().setRouterMq(
+                distinctLinks(spec.getBoxesRelation().getRouterMq(), schemaValidationContext));
+        spec.getBoxesRelation().setRouterGrpc(
+                distinctLinks(spec.getBoxesRelation().getRouterGrpc(), schemaValidationContext));
+        spec.setDictionariesRelation(
+                distinctLinks(spec.getDictionariesRelation(), schemaValidationContext));
+        spec.setMultiDictionaryRelation(
+                distinctLinks(spec.getMultiDictionaryRelation(), schemaValidationContext));
+    }
+
+    private static List<MessageLink> linksWithDifferingEndpoints(
+            List<MessageLink> links, SchemaValidationContext schemaValidationContext) {
+        List<MessageLink> validLinks = new ArrayList<>();
+        for (var link : links) {
+            if (link.getTo().getBox().equals(link.getFrom().getBox())) {
+                String message = "\"from\" box name cannot be the same as \"to\" box name";
+                schemaValidationContext.addLinkErrorMessage(link.getName(),
+                        link.errorMessage(message));
+            } else {
+                validLinks.add(link);
+            }
+        }
+        return validLinks;
+    }
+
+    private static void removeLinksWithSameEndpoints(
+            Th2LinkSpec spec, SchemaValidationContext schemaValidationContext) {
+        BoxesRelation boxesRelation = spec.getBoxesRelation();
+        boxesRelation.setRouterMq(
+                linksWithDifferingEndpoints(boxesRelation.getRouterMq(), schemaValidationContext));
+        boxesRelation.setRouterGrpc(
+                linksWithDifferingEndpoints(boxesRelation.getRouterGrpc(), schemaValidationContext));
+    }
+
     private static void validateLinks(String schemaName,
                                       SchemaValidationContext schemaValidationContext,
                                       Map<String, Map<String, RepositoryResource>> repositoryMap) {
@@ -114,8 +179,12 @@ public class SchemaValidator {
         var dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
         var multiDictionaryLinkValidator = new MultiDictionaryLinkValidator(schemaContext);
 
+
         for (RepositoryResource linkRes : links) {
             Th2LinkSpec spec = mapper.convertValue(linkRes.getSpec(), Th2LinkSpec.class);
+            removeDuplicateLinks(spec, schemaValidationContext);
+            removeLinksWithSameEndpoints(spec, schemaValidationContext);
+
             for (MessageLink mqLink : spec.getBoxesRelation().getRouterMq()) {
                 mqLinkValidator.validateLink(linkRes, mqLink);
             }
