@@ -34,6 +34,7 @@ public final class MultiDictionaryLink implements IdentifiableLink {
         return dictionaries.stream().map(MultiDictionaryDescription::getName).collect(Collectors.toList());
     }
 
+    @Override
     public String getName() {
         return name;
     }

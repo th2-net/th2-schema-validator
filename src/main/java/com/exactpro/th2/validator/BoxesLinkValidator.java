@@ -18,7 +18,6 @@ package com.exactpro.th2.validator;
 
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.enums.ValidationResult;
-import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.MessageLink;
 
@@ -61,28 +60,14 @@ abstract class BoxesLinkValidator {
                     fromBoxName, fromResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
             schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName,
-                    new BoxLinkErrorMessage(
-                            link.getName(),
-                            fromBoxName,
-                            toBoxName,
-                            message
-                    )
-            );
+            schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(message));
         }
         if (!toResValidationResult.getValidationStatus().equals(VALID)) {
             String message = format("\"%s\" %s. link will be ignored.",
                     toBoxName, toResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
             schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName,
-                    new BoxLinkErrorMessage(
-                            link.getName(),
-                            fromBoxName,
-                            toBoxName,
-                            message
-                    )
-            );
+            schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(message));
         }
     }
 }

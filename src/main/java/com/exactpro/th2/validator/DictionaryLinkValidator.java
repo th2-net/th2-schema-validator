@@ -42,24 +42,12 @@ public class DictionaryLinkValidator {
                     return;
                 }
                 schemaValidationContext.setInvalidResource(linkResName);
-                schemaValidationContext.addLinkErrorMessage(linkResName,
-                        new DictionaryLinkErrorMessage(
-                                link.getName(),
-                                boxName,
-                                dictionaryName,
-                                String.format("Dictionary '%s' doesn't exist", dictionaryName)
-                        )
-                );
+                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
+                        String.format("Dictionary '%s' doesn't exist", dictionaryName)));
             } else {
                 schemaValidationContext.setInvalidResource(linkResName);
-                schemaValidationContext.addLinkErrorMessage(linkResName,
-                        new DictionaryLinkErrorMessage(
-                                link.getName(),
-                                boxName,
-                                dictionaryName,
-                                String.format("Resource '%s' doesn't exist", boxName)
-                        )
-                );
+                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
+                        String.format("Resource '%s' doesn't exist", boxName)));
             }
         } catch (Exception e) {
             schemaValidationContext.setInvalidResource(linkResName);

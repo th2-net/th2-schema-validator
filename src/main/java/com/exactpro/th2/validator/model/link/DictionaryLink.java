@@ -29,6 +29,7 @@ public final class DictionaryLink implements IdentifiableLink {
 
     private DictionaryDescription dictionary;
 
+    @Override
     public String getName() {
         return this.name;
     }
