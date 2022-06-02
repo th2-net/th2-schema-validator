@@ -32,6 +32,6 @@ public class MultiDictionaryLinkErrorMessage extends LinkErrorMessage {
     @Override
     public String toPrintableMessage() {
         return String.format("link: \"%s\" [box: %s] - [dictionaries: %s] is invalid. %s",
-                getLinkName(), box, dictionaryNames, getMessage());
+                getLinkName(), box, dictionaryNames.toString(), getMessage());
     }
 }

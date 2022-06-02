@@ -29,6 +29,7 @@ public final class MessageLink implements IdentifiableLink {
 
     private Endpoint to;
 
+    @Override
     public String getName() {
         return this.name;
     }
