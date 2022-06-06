@@ -16,11 +16,11 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.enums.ValidationResult;
 import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.MessageLink;
-import com.exactpro.th2.infrarepo.RepositoryResource;
 
 import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
 import static java.lang.String.format;

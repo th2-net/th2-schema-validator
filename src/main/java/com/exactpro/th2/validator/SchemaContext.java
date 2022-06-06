@@ -16,8 +16,8 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.enums.ValidationResult;
-import com.exactpro.th2.infrarepo.RepositoryResource;
 
 import java.util.ArrayList;
 import java.util.Map;

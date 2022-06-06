@@ -16,7 +16,7 @@
 
 package com.exactpro.th2.validator;
 
-import com.exactpro.th2.infrarepo.RepositoryResource;
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.errormessages.DictionaryLinkErrorMessage;
 import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 

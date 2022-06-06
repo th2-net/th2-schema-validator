@@ -16,6 +16,7 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.chain.impl.*;
 import com.exactpro.th2.validator.enums.BoxDirection;
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
@@ -23,7 +24,6 @@ import com.exactpro.th2.validator.enums.ValidationResult;
 import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.MessageLink;
-import com.exactpro.th2.infrarepo.RepositoryResource;
 
 class MqLinkValidator extends BoxesLinkValidator {
 

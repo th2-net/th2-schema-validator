@@ -16,7 +16,7 @@
 
 package com.exactpro.th2.validator;
 
-import com.exactpro.th2.infrarepo.RepositoryResource;
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 
 import java.util.*;
@@ -86,7 +86,7 @@ public class UrlPathConflicts {
                     continue;
                 }
 
-                var settings = (Map<String, Object>) spec.get("extended-settings");
+                var settings = (Map<String, Object>) spec.get("extendedSettings");
                 if (settings == null) {
                     continue;
                 }

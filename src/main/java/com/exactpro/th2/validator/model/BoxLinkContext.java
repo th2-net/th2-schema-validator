@@ -16,7 +16,7 @@
 
 package com.exactpro.th2.validator.model;
 
-import com.exactpro.th2.infrarepo.RepositoryResource;
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.enums.BoxDirection;
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
 

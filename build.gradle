@@ -9,7 +9,7 @@ plugins {
 
 ext {
     sharedDir = file("${project.rootDir}/libs")
-    infra_repo_version = '1.1.2'
+    infra_repo_version = '1.1.8'
     fabric_version = '5.9.0'
 }
 group = 'com.exactpro.th2'
@@ -23,12 +23,13 @@ repositories {
         url 'https://dl.bintray.com/exactpro/th2'
     }
     maven {
-            name 'Sonatype_snapshots'
-            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+        name 'Sonatype_snapshots'
+        url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
     }
+
     maven {
-            name 'Sonatype_releases'
-            url 'https://s01.oss.sonatype.org/content/repositories/releases/'
+        name 'Sonatype_releases'
+        url 'https://s01.oss.sonatype.org/content/repositories/releases/'
     }
 
     configurations.all {

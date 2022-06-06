@@ -16,6 +16,7 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.chain.impl.ExpectedServiceClass;
 import com.exactpro.th2.validator.chain.impl.PinExist;
 import com.exactpro.th2.validator.chain.impl.ResourceExists;
@@ -26,7 +27,6 @@ import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.Endpoint;
 import com.exactpro.th2.validator.model.link.MessageLink;
-import com.exactpro.th2.infrarepo.RepositoryResource;
 
 class GrpcLinkValidator extends BoxesLinkValidator {
 

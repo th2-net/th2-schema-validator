@@ -16,12 +16,12 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import com.exactpro.th2.validator.model.BoxesRelation;
 import com.exactpro.th2.validator.model.Th2LinkSpec;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
-import com.exactpro.th2.infrarepo.RepositoryResource;
 import com.exactpro.th2.infrarepo.ResourceType;
 import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 import com.exactpro.th2.validator.util.SecretsUtils;

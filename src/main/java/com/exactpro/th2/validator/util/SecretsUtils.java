@@ -16,7 +16,7 @@
 
 package com.exactpro.th2.validator.util;
 
-import com.exactpro.th2.infrarepo.RepositoryResource;
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;

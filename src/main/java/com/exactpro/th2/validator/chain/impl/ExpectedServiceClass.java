@@ -16,11 +16,11 @@
 
 package com.exactpro.th2.validator.chain.impl;
 
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.chain.AbstractValidator;
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.exactpro.th2.validator.enums.ValidationResult;
 import com.exactpro.th2.validator.model.*;
-import com.exactpro.th2.infrarepo.RepositoryResource;
 import com.exactpro.th2.validator.model.pin.GrpcClientPin;
 import com.exactpro.th2.validator.model.pin.GrpcServerPin;
 import com.fasterxml.jackson.databind.ObjectMapper;
