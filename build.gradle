@@ -9,8 +9,8 @@ plugins {
 
 ext {
     sharedDir = file("${project.rootDir}/libs")
-    infra_repo_version = '1.1.8'
-    fabric_version = '5.9.0'
+    infra_repo_version = '1.1.10'
+    fabric_version = '5.12.2'
 }
 group = 'com.exactpro.th2'
 version = release_version
@@ -145,7 +145,7 @@ checkstyle {
 dependencies {
     api 'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r'
     api 'org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:5.10.0.202012080955-r'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.1'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.3'
     implementation 'org.apache.commons:commons-text:1.9'
     implementation "com.exactpro.th2:infra-repo:${infra_repo_version}"
     implementation "io.fabric8:kubernetes-client:${fabric_version}"
