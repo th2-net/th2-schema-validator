@@ -18,35 +18,43 @@ package com.exactpro.th2.validator.model.link;
 
 import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.exactpro.th2.validator.model.pin.LinkToEndpoint;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public final class MessageLink implements IdentifiableLink {
+    private final LinkMeta linkMeta;
 
-    private String name;
+    private final Endpoint from;
 
-    private Endpoint from;
+    private final Endpoint to;
 
-    private Endpoint to;
+    public MessageLink(LinkMeta linkMeta, Endpoint from, Endpoint to) {
+        this.linkMeta = linkMeta;
+        this.from = from;
+        this.to = to;
+    }
+
+    public LinkToEndpoint mqLinkToEndpoint() {
+        return new LinkToEndpoint(from.getBox(), from.getPin());
+    }
+
+    public LinkToEndpoint grpcLinkToEndpoint() {
+        return new LinkToEndpoint(to.getBox(), to.getPin());
+    }
 
     @Override
-    public String getName() {
-        return this.name;
+    public String getResourceName() {
+        return this.linkMeta.resName();
     }
 
     @Override
     public String getContent() {
-        return String.format("%s[%s:%s-%s:%s]", this.getClass().getSimpleName(),
-                from.getBox(), from.getPin(),
-                to.getBox(), to.getPin());
+        return this.linkMeta.content();
     }
 
     @Override
     public LinkErrorMessage errorMessage(String message) {
         return new BoxLinkErrorMessage(
-                getName(),
-                from.getBox(),
-                to.getBox(),
+                getContent(),
                 message
         );
     }
@@ -55,8 +63,25 @@ public final class MessageLink implements IdentifiableLink {
         return this.from;
     }
 
+    @Override
+    public String getFromBox() {
+        return getFrom().getBox();
+    }
+
+    public String getFromPin() {
+        return getFrom().getPin();
+    }
+
     public Endpoint getTo() {
         return this.to;
+    }
+
+    public String getToBox() {
+        return getTo().getBox();
+    }
+
+    public String getToPin() {
+        return getTo().getPin();
     }
 
     @Override

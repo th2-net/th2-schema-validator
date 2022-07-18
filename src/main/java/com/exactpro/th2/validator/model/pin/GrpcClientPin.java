@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GrpcClientPin implements Th2Pin {
+public class GrpcClientPin implements Linkful {
     private String name;
 
     private List<String> attributes = new ArrayList<>();
 
     private String serviceClass;
+
+    private List<LinkToEndpoint> linkTo = new ArrayList<>();
 
     @Override
     public String getName() {
@@ -40,5 +42,10 @@ public class GrpcClientPin implements Th2Pin {
 
     public String getServiceClass() {
         return serviceClass;
+    }
+
+    @Override
+    public List<LinkToEndpoint> getLinkTo() {
+        return linkTo;
     }
 }

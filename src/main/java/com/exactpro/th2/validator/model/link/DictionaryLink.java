@@ -23,37 +23,38 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class DictionaryLink implements IdentifiableLink {
 
-    private String name;
+    private LinkMeta linkMeta;
 
-    private String box;
+    private String fromBox;
 
     private DictionaryDescription dictionary;
 
     @Override
-    public String getName() {
-        return this.name;
+    public String getContent() {
+        return String.format("%s[%s:%s]", /* may be removed */
+                this.getClass().getSimpleName(),
+                this.fromBox,
+                this.dictionary == null ? "null" : this.dictionary.getName());
     }
 
     @Override
-    public String getContent() {
-        return String.format("%s[%s:%s]",
-                this.getClass().getSimpleName(),
-                this.box,
-                this.dictionary == null ? "null" : this.dictionary.getName());
+    public String getResourceName() {
+        return linkMeta.resName();
     }
 
     @Override
     public LinkErrorMessage errorMessage(String message) {
         return new DictionaryLinkErrorMessage(
-                getName(),
-                getBox(),
+                getContent(),
+                getFromBox(),
                 dictionary.getName(),
                 message
         );
     }
 
-    public String getBox() {
-        return this.box;
+    @Override
+    public String getFromBox() {
+        return this.fromBox;
     }
 
     public DictionaryDescription getDictionary() {

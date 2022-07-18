@@ -27,7 +27,7 @@ import static java.lang.String.format;
 abstract class BoxesLinkValidator {
     protected SchemaContext schemaContext;
 
-    abstract void validateLink(RepositoryResource linkRes, MessageLink link);
+    abstract void validateLink(MessageLink link);
 
     abstract ValidationResult validateByContext(RepositoryResource resource, BoxLinkContext context);
 
@@ -38,10 +38,9 @@ abstract class BoxesLinkValidator {
     }
 
     protected void validate(BoxLinkContext fromContext, BoxLinkContext toContext,
-                            RepositoryResource linkRes, MessageLink link) {
+                            String resName, MessageLink link) {
         RepositoryResource fromRes = schemaContext.getBox(fromContext.getBoxName());
         RepositoryResource toRes = schemaContext.getBox(toContext.getBoxName());
-        String linkResName = linkRes.getMetadata().getName();
         SchemaValidationContext schemaValidationContext = schemaContext.getSchemaValidationContext();
 
         ValidationResult fromResValidationResult = validateByContext(fromRes, fromContext);
@@ -49,25 +48,25 @@ abstract class BoxesLinkValidator {
 
         if (fromResValidationResult.getValidationStatus().equals(VALID)
                 && toResValidationResult.getValidationStatus().equals(VALID)) {
-            addValidMessageLink(linkResName, link);
+            addValidMessageLink(resName, link);
             return;
         }
-        String fromBoxName = link.getFrom().getBox();
-        String toBoxName = link.getTo().getBox();
+        String fromBoxName = link.getFromBox();
+        String toBoxName = link.getToBox();
         //check if "from" resource is valid
         if (!fromResValidationResult.getValidationStatus().equals(VALID)) {
             String message = format("\"%s\" %s. link will be ignored.",
                     fromBoxName, fromResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
-            schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(message));
+            schemaValidationContext.setInvalidResource(resName);
+            schemaValidationContext.addLinkErrorMessage(resName, link.errorMessage(message));
         }
         if (!toResValidationResult.getValidationStatus().equals(VALID)) {
             String message = format("\"%s\" %s. link will be ignored.",
                     toBoxName, toResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
-            schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(message));
+            schemaValidationContext.setInvalidResource(resName);
+            schemaValidationContext.addLinkErrorMessage(resName, link.errorMessage(message));
         }
     }
 }

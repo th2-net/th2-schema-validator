@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.errormessages;
+package com.exactpro.th2.validator.model.pin;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MultiDictionaryLinkErrorMessage extends LinkErrorMessage {
-    private final String box;
+public final class MqSubscriberPin extends MqPin implements Linkful {
 
-    private final List<String> dictionaryNames;
-
-    public MultiDictionaryLinkErrorMessage(
-            String linkContent, String box, List<String> dictionaryNames, String message) {
-        super(linkContent, message);
-        this.box = box;
-        this.dictionaryNames = dictionaryNames;
-    }
+    private List<LinkToEndpoint> linkTo = new ArrayList<>();
 
     @Override
-    public String toPrintableMessage() {
-        return String.format("link: \"%s\" [box: %s] - [dictionaries: %s] is invalid. %s",
-                getLinkContent(), box, dictionaryNames.toString(), getMessage());
+    public List<LinkToEndpoint> getLinkTo() {
+        return linkTo;
     }
 }

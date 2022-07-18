@@ -61,7 +61,8 @@ public final class ExpectedServiceClass extends AbstractValidator {
         GrpcServerPin linkedPin = linkedResSpec.getGrpcServerPin(linkedPinName);
 
         if (linkedPin == null) {
-            return ValidationResult.invalid(format("Linked pin: [%s] does not exist", linkedPinName));
+            return ValidationResult.invalid(
+                    format("Linked grpc pin: [%s] does not exist in server section", linkedPinName));
         }
 
         Set<String> serviceClasses = linkedPin.getServiceClasses();

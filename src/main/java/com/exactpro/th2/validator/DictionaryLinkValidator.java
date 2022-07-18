@@ -31,7 +31,7 @@ public class DictionaryLinkValidator {
         String linkResName = linkRes.getMetadata().getName();
         SchemaValidationContext schemaValidationContext = schemaContext.getSchemaValidationContext();
         try {
-            String boxName = link.getBox();
+            String boxName = link.getFromBox();
             String dictionaryName = link.getDictionary().getName();
             RepositoryResource boxResource = schemaContext.getBox(boxName);
             //First check if box is present
@@ -53,7 +53,7 @@ public class DictionaryLinkValidator {
             schemaValidationContext.setInvalidResource(linkResName);
             schemaValidationContext.addLinkErrorMessage(linkResName,
                     new DictionaryLinkErrorMessage(
-                            link.getName(),
+                            link.getContent(),
                             null,
                             null,
                             String.format("Exception: %s", e.getMessage())

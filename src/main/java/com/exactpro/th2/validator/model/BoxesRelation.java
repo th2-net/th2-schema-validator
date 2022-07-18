@@ -35,6 +35,14 @@ public final class BoxesRelation {
         return this.routerGrpc;
     }
 
+    public void addToMq(MessageLink link) {
+        getRouterMq().add(link);
+    }
+
+    public void addToGrpc(MessageLink link) {
+        getRouterGrpc().add(link);
+    }
+
     public void setRouterMq(List<MessageLink> routerMq) {
         if (routerMq != null) {
             this.routerMq = routerMq;

@@ -25,6 +25,11 @@ public final class Endpoint {
 
     private String pin;
 
+    public Endpoint(String box, String pin) {
+        this.box = box;
+        this.pin = pin;
+    }
+
     private String strategy;
 
     public String getBox() {
