@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,32 @@ package com.exactpro.th2.validator.model.pin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GrpcSection {
-    private List<GrpcClientPin> client = new ArrayList<>();
+public final class MqSection {
+    private List<MqSubscriberPin> subscribers = new ArrayList<>();
 
-    private List<GrpcServerPin> server = new ArrayList<>();
+    private List<MqPublisherPin> publishers = new ArrayList<>();
 
-    public List<GrpcClientPin> getClient() {
-        return client;
+    public List<MqSubscriberPin> getSubscribers() {
+        return subscribers;
     }
 
-    public List<GrpcServerPin> getServer() {
-        return server;
+    public List<MqPublisherPin> getPublishers() {
+        return publishers;
     }
 
-    private <T extends Th2Pin> T getPin(List<T> pins, String name) {
+    private <T extends MqPin> T getPin(List<T> pins, String name) {
         return pins.stream()
                 .filter(p -> p.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public GrpcClientPin getClientPin(String name) {
-        return getPin(getClient(), name);
-    }
+    public MqPin getPin(String name) {
+        MqSubscriberPin subscriber = getPin(subscribers, name);
+        if (subscriber != null) {
+            return subscriber;
+        }
 
-    public GrpcServerPin getServerPin(String name) {
-        return getPin(getServer(), name);
+        return getPin(publishers, name);
     }
 }

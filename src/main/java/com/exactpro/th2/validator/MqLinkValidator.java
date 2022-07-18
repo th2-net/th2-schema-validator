@@ -23,6 +23,7 @@ import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.exactpro.th2.validator.enums.ValidationResult;
 import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
+import com.exactpro.th2.validator.model.link.Endpoint;
 import com.exactpro.th2.validator.model.link.MessageLink;
 
 class MqLinkValidator extends BoxesLinkValidator {
@@ -32,45 +33,44 @@ class MqLinkValidator extends BoxesLinkValidator {
     }
 
     @Override
-    void validateLink(RepositoryResource linkRes, MessageLink link) {
+    void validateLink(MessageLink link) {
+        Endpoint fromEndpoint = link.getFrom();
+        Endpoint toEndpoint = link.getTo();
+        String resName = link.getResourceName();
+        String fromBoxName = fromEndpoint.getBox();
 
-        var fromBoxSpec = link.getFrom();
-        var toBoxSpec = link.getTo();
 
         try {
-            RepositoryResource toRes = schemaContext.getBox(toBoxSpec.getBox());
-            RepositoryResource fromRes = schemaContext.getBox(fromBoxSpec.getBox());
+            RepositoryResource toRes = schemaContext.getBox(resName);
+            RepositoryResource fromRes = schemaContext.getBox(fromBoxName);
 
             var fromContext = new BoxLinkContext.Builder()
-                    .setBoxName(fromBoxSpec.getBox())
-                    .setBoxPinName(fromBoxSpec.getPin())
+                    .setBoxName(fromBoxName)
+                    .setBoxPinName(fromEndpoint.getPin())
                     .setBoxDirection(BoxDirection.from)
                     .setConnectionType(SchemaConnectionType.mq)
                     .setLinkedResource(toRes)
-                    .setLinkedResourceName(toBoxSpec.getBox())
-                    .setLinkedPinName(toBoxSpec.getPin())
+                    .setLinkedResourceName(toEndpoint.getBox())
+                    .setLinkedPinName(toEndpoint.getPin())
                     .build();
 
             var toContext = new BoxLinkContext.Builder()
-                    .setBoxName(toBoxSpec.getBox())
-                    .setBoxPinName(toBoxSpec.getPin())
+                    .setBoxName(toEndpoint.getBox())
+                    .setBoxPinName(toEndpoint.getPin())
                     .setBoxDirection(BoxDirection.to)
                     .setConnectionType(SchemaConnectionType.mq)
                     .setLinkedResource(fromRes)
-                    .setLinkedResourceName(fromBoxSpec.getBox())
-                    .setLinkedPinName(fromBoxSpec.getPin())
+                    .setLinkedResourceName(fromEndpoint.getBox())
+                    .setLinkedPinName(fromEndpoint.getPin())
                     .build();
 
-            validate(fromContext, toContext, linkRes, link);
+            validate(fromContext, toContext, resName, link);
         } catch (Exception e) {
-            String linkResName = linkRes.getMetadata().getName();
             var schemaValidationContext = schemaContext.getSchemaValidationContext();
-            schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName,
+            schemaValidationContext.setInvalidResource(resName);
+            schemaValidationContext.addLinkErrorMessage(resName,
                     new BoxLinkErrorMessage(
-                            link.getName(),
-                            null,
-                            null,
+                            link.getContent(),
                             String.format("Exception: %s", e.getMessage())
                     )
             );

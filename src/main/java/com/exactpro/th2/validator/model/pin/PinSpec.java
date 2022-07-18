@@ -16,15 +16,12 @@
 
 package com.exactpro.th2.validator.model.pin;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PinSpec {
-    private List<MqPin> mq = new ArrayList<>();
+    private MqSection mq = new MqSection();
 
     private GrpcSection grpc = new GrpcSection();
 
-    public List<MqPin> getMq() {
+    public MqSection getMq() {
         return mq;
     }
 

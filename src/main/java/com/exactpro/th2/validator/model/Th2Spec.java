@@ -29,37 +29,36 @@ public final class Th2Spec {
         return pins;
     }
 
-    public List<MqPin> getMqPins() {
+    public MqSection getMqPins() {
         return pins.getMq();
     }
 
+    public List<MqSubscriberPin> getMqSubscribers() {
+        return getMqPins().getSubscribers();
+    }
+
+    public GrpcSection getGrpcPins() {
+        return pins.getGrpc();
+    }
+
     public List<GrpcClientPin> getGrpcClientPins() {
-        return this.pins.getGrpc().getClient();
+        return getGrpcPins().getClient();
     }
 
     public List<GrpcServerPin> getGrpcServerPins() {
-        return this.pins.getGrpc().getServer();
+        return getGrpcPins().getServer();
     }
 
     public MqPin getMqPin(String name) {
-        return pins.getMq().stream()
-                .filter(p -> p.getName().equals(name))
-                .findFirst()
-                .orElse(null);
+        return getMqPins().getPin(name);
     }
 
     public GrpcClientPin getGrpcClientPin(String name) {
-        return this.pins.getGrpc().getClient().stream()
-                .filter(p -> p.getName().equals(name))
-                .findFirst()
-                .orElse(null);
+        return getGrpcPins().getClientPin(name);
     }
 
     public GrpcServerPin getGrpcServerPin(String name) {
-        return this.pins.getGrpc().getServer().stream()
-                .filter(p -> p.getName().equals(name))
-                .findFirst()
-                .orElse(null);
+        return getGrpcPins().getServerPin(name);
     }
 
     public Th2Pin getPin(String name) {

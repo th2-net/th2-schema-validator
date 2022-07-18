@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 
 public final class MultiDictionaryLink implements IdentifiableLink {
 
-    private String name;
+    private LinkMeta linkMeta;
 
-    private String box;
+    private String fromBox;
 
     private List<MultiDictionaryDescription> dictionaries;
 
@@ -35,30 +35,31 @@ public final class MultiDictionaryLink implements IdentifiableLink {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getContent() {
+        return String.format("%s[%s:%s]", /* may be removed */
+                this.getClass().getSimpleName(),
+                this.fromBox,
+                this.dictionaries == null ? "null" : dictionaries.toString());
     }
 
     @Override
-    public String getContent() {
-        return String.format("%s[%s:%s]",
-                this.getClass().getSimpleName(),
-                this.box,
-                this.dictionaries == null ? "null" : dictionaries.toString());
+    public String getResourceName() {
+        return linkMeta.resName();
     }
 
     @Override
     public LinkErrorMessage errorMessage(String message) {
         return new MultiDictionaryLinkErrorMessage(
-                getName(),
-                getBox(),
+                getContent(),
+                getFromBox(),
                 getDictionaryNames(),
                 message
         );
     }
 
-    public String getBox() {
-        return box;
+    @Override
+    public String getFromBox() {
+        return fromBox;
     }
 
     public List<MultiDictionaryDescription> getDictionaries() {

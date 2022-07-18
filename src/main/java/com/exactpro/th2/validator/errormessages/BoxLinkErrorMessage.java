@@ -18,27 +18,13 @@ package com.exactpro.th2.validator.errormessages;
 
 public class BoxLinkErrorMessage extends LinkErrorMessage {
 
-    private final String from;
-
-    private final String to;
-
-    public BoxLinkErrorMessage(String linkName, String from, String to, String message) {
-        super(linkName, message);
-        this.from = from;
-        this.to = to;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public String getTo() {
-        return to;
+    public BoxLinkErrorMessage(String linkContent, String message) {
+        super(linkContent, message);
     }
 
     @Override
     public String toPrintableMessage() {
-        return String.format("link: \"%s\" [from: %s]-[to: %s] is invalid. %s",
-                getLinkName(), from, to, getMessage());
+        return String.format("link: \"%s\" is invalid. %s",
+                getLinkContent(), getMessage());
     }
 }

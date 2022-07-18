@@ -35,41 +35,38 @@ class GrpcLinkValidator extends BoxesLinkValidator {
     }
 
     @Override
-    void validateLink(RepositoryResource linkRes, MessageLink link) {
-
-        Endpoint fromBoxSpec = link.getFrom();
-        Endpoint toBoxSpec = link.getTo();
+    void validateLink(MessageLink link) {
+        Endpoint fromBoxEndpoint = link.getFrom();
+        String resName = link.getResourceName();
+        Endpoint toBoxEndpoint = link.getTo();
 
         try {
-            RepositoryResource toRes = schemaContext.getBox(toBoxSpec.getBox());
+            RepositoryResource toRes = schemaContext.getBox(toBoxEndpoint.getBox());
 
             var fromContext = new BoxLinkContext.Builder()
-                    .setBoxName(fromBoxSpec.getBox())
-                    .setBoxPinName(fromBoxSpec.getPin())
+                    .setBoxName(fromBoxEndpoint.getBox())
+                    .setBoxPinName(fromBoxEndpoint.getPin())
                     .setBoxDirection(BoxDirection.from)
                     .setConnectionType(SchemaConnectionType.grpc_client)
                     .setLinkedResource(toRes)
-                    .setLinkedResourceName(toBoxSpec.getBox())
-                    .setLinkedPinName(toBoxSpec.getPin())
+                    .setLinkedResourceName(toBoxEndpoint.getBox())
+                    .setLinkedPinName(toBoxEndpoint.getPin())
                     .build();
 
             var toContext = new BoxLinkContext.Builder()
-                    .setBoxName(toBoxSpec.getBox())
-                    .setBoxPinName(toBoxSpec.getPin())
+                    .setBoxName(toBoxEndpoint.getBox())
+                    .setBoxPinName(toBoxEndpoint.getPin())
                     .setBoxDirection(BoxDirection.to)
                     .setConnectionType(SchemaConnectionType.grpc_server)
                     .build();
 
-            validate(fromContext, toContext, linkRes, link);
+            validate(fromContext, toContext, resName, link);
         } catch (Exception e) {
-            String linkResName = linkRes.getMetadata().getName();
             var schemaValidationContext = schemaContext.getSchemaValidationContext();
-            schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName,
+            schemaValidationContext.setInvalidResource(resName);
+            schemaValidationContext.addLinkErrorMessage(resName,
                     new BoxLinkErrorMessage(
-                            link.getName(),
-                            null,
-                            null,
+                            link.getContent(),
                             String.format("Exception: %s", e.getMessage())
                     )
             );

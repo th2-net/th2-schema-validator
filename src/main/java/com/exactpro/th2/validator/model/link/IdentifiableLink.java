@@ -19,9 +19,11 @@ package com.exactpro.th2.validator.model.link;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 
 public interface IdentifiableLink {
-    String getName();
-
     String getContent();
+
+    String getResourceName();
+
+    String getFromBox();
 
     LinkErrorMessage errorMessage(String message);
 }

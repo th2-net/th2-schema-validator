@@ -22,8 +22,8 @@ public class DictionaryLinkErrorMessage extends LinkErrorMessage {
 
     private final String dictionary;
 
-    public DictionaryLinkErrorMessage(String linkName, String box, String dictionary, String message) {
-        super(linkName, message);
+    public DictionaryLinkErrorMessage(String linkContent, String box, String dictionary, String message) {
+        super(linkContent, message);
         this.box = box;
         this.dictionary = dictionary;
     }
@@ -39,6 +39,6 @@ public class DictionaryLinkErrorMessage extends LinkErrorMessage {
     @Override
     public String toPrintableMessage() {
         return String.format("link: \"%s\" [box: %s]-[dictionary: %s] is invalid. %s",
-                getLinkName(), box, dictionary, getMessage());
+                getLinkContent(), box, dictionary, getMessage());
     }
 }

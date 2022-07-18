@@ -19,12 +19,12 @@ package com.exactpro.th2.validator;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import com.exactpro.th2.validator.model.BoxesRelation;
-import com.exactpro.th2.validator.model.Th2LinkSpec;
-import com.exactpro.th2.validator.model.link.DictionaryLink;
+import com.exactpro.th2.validator.model.Th2Spec;
+import com.exactpro.th2.validator.model.link.Endpoint;
 import com.exactpro.th2.validator.model.link.IdentifiableLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.infrarepo.ResourceType;
-import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
+import com.exactpro.th2.validator.model.pin.*;
 import com.exactpro.th2.validator.util.SecretsUtils;
 import com.exactpro.th2.validator.util.SourceHashUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,6 +38,7 @@ import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
 import static com.exactpro.th2.validator.util.SecretsUtils.extractCustomConfig;
 import static com.exactpro.th2.validator.util.SecretsUtils.generateSecretsConfig;
 
+@SuppressWarnings("unchecked")
 public class SchemaValidator {
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -99,26 +100,16 @@ public class SchemaValidator {
     }
 
     private static <T extends IdentifiableLink> List<T> distinctLinks(
-            String linkResName, List<T> links, SchemaValidationContext schemaValidationContext) {
+            List<T> links,
+            SchemaValidationContext schemaValidationContext) {
 
-        Set<String> linkNames = new HashSet<>();
         Set<String> linkContents = new HashSet<>();
         List<T> distinctLinks = new ArrayList<>();
         for (var link : links) {
-            boolean sameName = !linkNames.add(link.getName());
             boolean sameContent = !linkContents.add(link.getContent());
-            if (sameName && sameContent) {
-                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
-                        "Link has the same name and same content as the other link(s). Ignoring"));
-
-            } else if (sameName) {
-                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
-                        "Link has the same name as the other link(s) but different content"
-                ));
-                distinctLinks.add(link);
-            } else if (sameContent) {
-                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
-                        "Link has the same content as other link(s) but different name. Ignoring"));
+            if (sameContent) {
+                schemaValidationContext.addLinkErrorMessage(link.getResourceName(), link.errorMessage(
+                        "Link is the same as other link(s). Ignoring"));
             } else {
                 distinctLinks.add(link);
             }
@@ -128,26 +119,26 @@ public class SchemaValidator {
     }
 
     private static void removeDuplicateLinks(
-            String linkResName, Th2LinkSpec spec, SchemaValidationContext schemaValidationContext) {
+            BoxesRelation links, SchemaValidationContext schemaValidationContext) {
 
-        spec.getBoxesRelation().setRouterMq(
-                distinctLinks(linkResName, spec.getBoxesRelation().getRouterMq(), schemaValidationContext));
-        spec.getBoxesRelation().setRouterGrpc(
-                distinctLinks(linkResName, spec.getBoxesRelation().getRouterGrpc(), schemaValidationContext));
-        spec.setDictionariesRelation(
+        links.setRouterMq(
+                distinctLinks(links.getRouterMq(), schemaValidationContext));
+        links.setRouterGrpc(
+                distinctLinks(links.getRouterGrpc(), schemaValidationContext));
+        /*spec.setDictionariesRelation(
                 distinctLinks(linkResName, spec.getDictionariesRelation(), schemaValidationContext));
         spec.setMultiDictionaryRelation(
-                distinctLinks(linkResName, spec.getMultiDictionaryRelation(), schemaValidationContext));
+                distinctLinks(linkResName, spec.getMultiDictionaryRelation(), schemaValidationContext));*/
     }
 
     private static List<MessageLink> linksWithDifferingEndpoints(
-            String linkResName, List<MessageLink> links, SchemaValidationContext schemaValidationContext) {
+            List<MessageLink> links, SchemaValidationContext schemaValidationContext) {
 
         List<MessageLink> validLinks = new ArrayList<>();
         for (var link : links) {
-            if (link.getTo().getBox().equals(link.getFrom().getBox())) {
-                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
-                        "\"from\" box name cannot be the same as \"to\" box name"));
+            if (link.getTo().getBox().equals(link.getFromBox())) {
+                schemaValidationContext.addLinkErrorMessage(link.getResourceName(), link.errorMessage(
+                        "\"from\" box name cannot be the same as \"to\" box name. Ignoring"));
             } else {
                 validLinks.add(link);
             }
@@ -156,19 +147,18 @@ public class SchemaValidator {
     }
 
     private static void removeLinksWithSameEndpoints(
-            String linkResName, Th2LinkSpec spec, SchemaValidationContext schemaValidationContext) {
+            BoxesRelation links, SchemaValidationContext schemaValidationContext) {
 
-        BoxesRelation boxesRelation = spec.getBoxesRelation();
-        boxesRelation.setRouterMq(
-                linksWithDifferingEndpoints(linkResName, boxesRelation.getRouterMq(), schemaValidationContext));
-        boxesRelation.setRouterGrpc(
-                linksWithDifferingEndpoints(linkResName, boxesRelation.getRouterGrpc(), schemaValidationContext));
+        links.setRouterMq(
+                linksWithDifferingEndpoints(links.getRouterMq(), schemaValidationContext));
+        links.setRouterGrpc(
+                linksWithDifferingEndpoints(links.getRouterGrpc(), schemaValidationContext));
     }
 
     private static void validateLinks(String schemaName,
                                       SchemaValidationContext schemaValidationContext,
                                       Map<String, Map<String, RepositoryResource>> repositoryMap) {
-        Collection<RepositoryResource> links = repositoryMap.get(ResourceType.Th2Link.kind()).values();
+        BoxesRelation links = arrangeBoxLinks(collectAllBoxes(repositoryMap).values());
         Map<String, RepositoryResource> dictionaries = repositoryMap.get(ResourceType.Th2Dictionary.kind());
 
         SchemaContext schemaContext = new SchemaContext(
@@ -180,29 +170,59 @@ public class SchemaValidator {
 
         var mqLinkValidator = new MqLinkValidator(schemaContext);
         var grpcLinkValidator = new GrpcLinkValidator(schemaContext);
-        var dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
-        var multiDictionaryLinkValidator = new MultiDictionaryLinkValidator(schemaContext);
+        /*var dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
+        var multiDictionaryLinkValidator = new MultiDictionaryLinkValidator(schemaContext);*/
 
+        removeDuplicateLinks(links, schemaValidationContext);
+        removeLinksWithSameEndpoints(links, schemaValidationContext);
 
-        for (RepositoryResource linkRes : links) {
-            Th2LinkSpec spec = mapper.convertValue(linkRes.getSpec(), Th2LinkSpec.class);
-            String linkResName = linkRes.getMetadata().getName();
-            removeDuplicateLinks(linkResName, spec, schemaValidationContext);
-            removeLinksWithSameEndpoints(linkResName, spec, schemaValidationContext);
-
-            for (MessageLink mqLink : spec.getBoxesRelation().getRouterMq()) {
-                mqLinkValidator.validateLink(linkRes, mqLink);
-            }
-            for (MessageLink grpcLink : spec.getBoxesRelation().getRouterGrpc()) {
-                grpcLinkValidator.validateLink(linkRes, grpcLink);
-            }
-            for (DictionaryLink dictionaryLink : spec.getDictionariesRelation()) {
-                dictionaryLinkValidator.validateLink(linkRes, dictionaryLink);
-            }
-            for (MultiDictionaryLink multiDictionaryLink : spec.getMultiDictionaryRelation()) {
-                multiDictionaryLinkValidator.validateLink(linkRes, multiDictionaryLink);
-            }
+        for (MessageLink mqLink : links.getRouterMq()) {
+            mqLinkValidator.validateLink(mqLink);
         }
+        for (MessageLink grpcLink : links.getRouterGrpc()) {
+            grpcLinkValidator.validateLink(grpcLink);
+        }
+        /*for (DictionaryLink dictionaryLink : spec.getDictionariesRelation()) {
+            dictionaryLinkValidator.validateLink(linkRes, dictionaryLink);
+        }
+        for (MultiDictionaryLink multiDictionaryLink : spec.getMultiDictionaryRelation()) {
+            multiDictionaryLinkValidator.validateLink(linkRes, multiDictionaryLink);
+        }*/
+    }
+
+    private static BoxesRelation arrangeBoxLinks(Collection<RepositoryResource> boxes) {
+        var boxesRelation = new BoxesRelation();
+
+        for (var box : boxes) {
+            String boxName = box.getMetadata().getName();
+            Th2Spec boxSpec = mapper.convertValue(box.getSpec(), Th2Spec.class);
+
+            List<MqSubscriberPin> subscribers = boxSpec.getMqSubscribers();
+            for (var sub : subscribers) {
+                List<LinkToEndpoint> linkTo = sub.getLinkTo();
+                String pinName = sub.getName();
+                linkTo.forEach(startPoint -> boxesRelation.addToMq(new MessageLink(
+                        startPoint.mqLinkMetaData(boxName, pinName),
+                        new Endpoint(startPoint.getBox(), startPoint.getPin()),
+                        new Endpoint(boxName, pinName)
+                )));
+            }
+
+            List<GrpcClientPin> clients = boxSpec.getGrpcClientPins();
+
+            for (var client : clients) {
+                List<LinkToEndpoint> linkTo = client.getLinkTo();
+                String pinName = client.getName();
+                linkTo.forEach(destination -> boxesRelation.addToGrpc(new MessageLink(
+                        destination.grpcLinkMetaData(boxName, pinName),
+                        new Endpoint(boxName, pinName),
+                        new Endpoint(destination.getBox(), destination.getPin())
+                )));
+            }
+
+        }
+
+        return boxesRelation;
     }
 
     private static Map<String, RepositoryResource> collectAllBoxes(
@@ -215,26 +235,79 @@ public class SchemaValidator {
         return allBoxes;
     }
 
+    private static void setValidLinkToSections(
+            List<Map<String, Object>> pins, Map<String, List<LinkToEndpoint>> validLinkToMapping) {
+
+        for (var pin : pins) {
+            String pinName = (String) pin.get("name");
+            if (validLinkToMapping.containsKey(pinName)) {
+                pin.put("linkTo", validLinkToMapping.get(pinName));
+            }
+        }
+    }
+
     public static void removeInvalidLinks(SchemaValidationContext validationContext,
-                                          Map<String, RepositoryResource> linkResources)
-            throws JsonProcessingException {
-        for (var entry : linkResources.entrySet()) {
-            RepositoryResource resource = entry.getValue();
-            String linkResName = entry.getKey();
-            Th2LinkSpec spec = mapper.convertValue(resource.getSpec(), Th2LinkSpec.class);
-            ResourceValidationContext resourceValidationContext = validationContext.getResource(linkResName);
-            if (resourceValidationContext == null || resourceValidationContext.getStatus().equals(VALID)) {
+                                          Collection<RepositoryResource> boxes) throws JsonProcessingException {
+
+        for (var box : boxes) {
+            String resName = box.getMetadata().getName();
+            ResourceValidationContext resValidationContext = validationContext.getResource(resName);
+            if (resValidationContext == null || resValidationContext.getStatus().equals(VALID)) {
                 continue;
             }
-            BoxesRelation boxesRelation = spec.getBoxesRelation();
-            boxesRelation.setRouterMq(resourceValidationContext.getValidMqLinks());
-            boxesRelation.setRouterGrpc(resourceValidationContext.getValidGrpcLinks());
-            spec.setDictionariesRelation(resourceValidationContext.getValidDictionaryLinks());
-            spec.setMultiDictionaryRelation(resourceValidationContext.getValidMultiDictionaryLinks());
-            resource.setSpec(spec);
+            var spec = (Map<String, Object>) box.getSpec();
+            Map<String, Object> pinSpec = getSection(spec, "pins");
+            Map<String, Object> mq = getSection(pinSpec, "mq");
+            List<Map<String, Object>> subscribersSection = getSectionArray(mq, "subscribers");
+
+            if (subscribersSection != null) {
+                Set<String> linkFulSubs = getLinkFulPinNames(subscribersSection);
+                List<MessageLink> validMqLinks = resValidationContext.getValidMqLinks();
+                Map<String, List<LinkToEndpoint>> validMqSubsLinkTo = new HashMap<>();
+                validMqLinks.forEach(msgLink ->
+                        validMqSubsLinkTo.computeIfAbsent(msgLink.getToPin(),
+                                sub -> new ArrayList<>()).add(msgLink.mqLinkToEndpoint()));
+                /* we have to remove LinkTos from all pins which have no valid links */
+                linkFulSubs.forEach(sub -> validMqSubsLinkTo.putIfAbsent(sub, null));
+                setValidLinkToSections(subscribersSection, validMqSubsLinkTo);
+            }
+
+            Map<String, Object> grpc = getSection(pinSpec, "grpc");
+            List<Map<String, Object>> clientSection = getSectionArray(grpc, "client");
+
+            if (clientSection != null) {
+                Set<String> linkFulClients = getLinkFulPinNames(clientSection);
+                List<MessageLink> validGrpcLinks = resValidationContext.getValidGrpcLinks();
+                Map<String, List<LinkToEndpoint>> validGrpcClientsLinkTo = new HashMap<>();
+                validGrpcLinks.forEach(msgLink ->
+                        validGrpcClientsLinkTo.computeIfAbsent(msgLink.getFromPin(),
+                                client -> new ArrayList<>()).add(msgLink.grpcLinkToEndpoint()));
+
+                linkFulClients.forEach(client -> validGrpcClientsLinkTo.putIfAbsent(client, null));
+                setValidLinkToSections(clientSection, validGrpcClientsLinkTo);
+            }
 
             String specStr = mapper.writeValueAsString(spec);
-            resource.setSourceHash(SourceHashUtil.digest(specStr));
+            box.setSourceHash(SourceHashUtil.digest(specStr));
         }
+    }
+
+    private static Set<String> getLinkFulPinNames(List<Map<String, Object>> pins) {
+        Set<String> linkFulSubs = new HashSet<>();
+        for (var pin : pins) {
+            List<Map<String, Object>> linkTo = getSectionArray(pin, "linkTo");
+            if (linkTo != null) {
+                linkFulSubs.add((String) pin.get("name"));
+            }
+        }
+        return linkFulSubs;
+    }
+
+    private static Map<String, Object> getSection(Map<String, Object> parent, String sectionName) {
+        return parent != null ? (Map<String, Object>) parent.get(sectionName) : null;
+    }
+
+    private static List<Map<String, Object>> getSectionArray(Map<String, Object> parent, String sectionName) {
+        return parent != null ? (List<Map<String, Object>>) parent.get(sectionName) : null;
     }
 }
