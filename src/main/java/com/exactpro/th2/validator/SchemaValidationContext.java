@@ -18,9 +18,7 @@ package com.exactpro.th2.validator;
 
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
-import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.exactpro.th2.validator.model.link.MessageLink;
-import com.exactpro.th2.validator.model.link.MultiDictionaryLink;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,16 +55,6 @@ public class SchemaValidationContext {
 
     public void addValidGrpcLink(String resourceName, MessageLink link) {
         this.resources.computeIfAbsent(resourceName, k -> new ResourceValidationContext()).addValidGrpcLink(link);
-    }
-
-    public void addValidDictionaryLink(String resourceName, DictionaryLink dictionaryLink) {
-        this.resources.computeIfAbsent(resourceName, k -> new ResourceValidationContext())
-                .addValidDictionaryLink(dictionaryLink);
-    }
-
-    public void addValidMultiDictionaryLink(String resourceName, MultiDictionaryLink multiDictionaryLink) {
-        this.resources.computeIfAbsent(resourceName, k -> new ResourceValidationContext())
-                .addValidMultiDictionaryLink(multiDictionaryLink);
     }
 
     public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {

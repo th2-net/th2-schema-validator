@@ -16,48 +16,42 @@
 
 package com.exactpro.th2.validator.model.link;
 
-import com.exactpro.th2.validator.errormessages.DictionaryLinkErrorMessage;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class DictionaryLink implements IdentifiableLink {
 
-    private LinkMeta linkMeta;
+    private final String resName;
 
-    private String fromBox;
+    private final String dictionary;
 
-    private DictionaryDescription dictionary;
+    public DictionaryLink(String resName, String dictionary) {
+        this.resName = resName;
+        this.dictionary = dictionary;
+    }
 
     @Override
     public String getContent() {
-        return String.format("%s[%s:%s]", /* may be removed */
-                this.getClass().getSimpleName(),
-                this.fromBox,
-                this.dictionary == null ? "null" : this.dictionary.getName());
+        return String.format("[box:%s : dictionary:%s]",
+                this.getResourceName(),
+                this.dictionary);
     }
 
     @Override
     public String getResourceName() {
-        return linkMeta.resName();
+        return resName;
     }
 
     @Override
     public LinkErrorMessage errorMessage(String message) {
-        return new DictionaryLinkErrorMessage(
+        return new LinkErrorMessage(
                 getContent(),
-                getFromBox(),
-                dictionary.getName(),
                 message
         );
     }
 
-    @Override
-    public String getFromBox() {
-        return this.fromBox;
-    }
-
-    public DictionaryDescription getDictionary() {
+    public String getDictionary() {
         return this.dictionary;
     }
 
@@ -70,5 +64,4 @@ public final class DictionaryLink implements IdentifiableLink {
     public int hashCode() {
         throw new AssertionError("method not defined");
     }
-
 }

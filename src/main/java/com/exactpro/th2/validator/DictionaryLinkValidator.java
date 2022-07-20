@@ -16,49 +16,65 @@
 
 package com.exactpro.th2.validator;
 
-import com.exactpro.th2.infrarepo.repo.RepositoryResource;
-import com.exactpro.th2.validator.errormessages.DictionaryLinkErrorMessage;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+@SuppressWarnings("unchecked")
 public class DictionaryLinkValidator {
     private final SchemaContext schemaContext;
+
+    private static final String LINK_START = "${dictionary_link:";
+
+    private static final String LINK_END = "}";
 
     public DictionaryLinkValidator(SchemaContext schemaContext) {
         this.schemaContext = schemaContext;
     }
 
-    void validateLink(RepositoryResource linkRes, DictionaryLink link) {
-        String linkResName = linkRes.getMetadata().getName();
+    void validateLinks() {
         SchemaValidationContext schemaValidationContext = schemaContext.getSchemaValidationContext();
-        try {
-            String boxName = link.getFromBox();
-            String dictionaryName = link.getDictionary().getName();
-            RepositoryResource boxResource = schemaContext.getBox(boxName);
-            //First check if box is present
-            if (boxResource != null) {
-                //if box is present validate that required dictionary also exists
-                if (schemaContext.getDictionary(dictionaryName) != null) {
-                    schemaValidationContext.addValidDictionaryLink(linkResName, link);
-                    return;
-                }
-                schemaValidationContext.setInvalidResource(linkResName);
-                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
-                        String.format("Dictionary '%s' doesn't exist", dictionaryName)));
-            } else {
-                schemaValidationContext.setInvalidResource(linkResName);
-                schemaValidationContext.addLinkErrorMessage(linkResName, link.errorMessage(
-                        String.format("Resource '%s' doesn't exist", boxName)));
+
+        for (var box : schemaContext.getAllBoxes()) {
+            var spec = (Map<String, Object>) box.getSpec();
+            var customConfig = (Map<String, Object>) spec.get("customConfig");
+            if (customConfig == null) {
+                continue;
             }
-        } catch (Exception e) {
-            schemaValidationContext.setInvalidResource(linkResName);
-            schemaValidationContext.addLinkErrorMessage(linkResName,
-                    new DictionaryLinkErrorMessage(
-                            link.getContent(),
-                            null,
-                            null,
-                            String.format("Exception: %s", e.getMessage())
-                    )
-            );
+
+            final String boxName = box.getMetadata().getName();
+            final Set<String> dictionaryNames = collectDictionaryNames(customConfig);
+
+            for (var dictionaryName : dictionaryNames) {
+                if (!schemaContext.dictionaryExists(dictionaryName)) {
+                    var link = new DictionaryLink(boxName, dictionaryName);
+                    schemaValidationContext.setInvalidResource(boxName);
+                    schemaValidationContext.addLinkErrorMessage(boxName, link.errorMessage(
+                            String.format("Dictionary '%s' doesn't exist", dictionaryName)));
+                }
+            }
         }
+    }
+
+    private Set<String> collectDictionaryNames(Map<String, Object> node) {
+        Set<String> dictionaryNames = new HashSet<>();
+        for (Object value : node.values()) {
+            if (value instanceof String) {
+                String valueStr = (String) value;
+                if (isLink(valueStr)) {
+                    var dictionaryName = valueStr.substring(LINK_START.length(), valueStr.length() - 1);
+                    dictionaryNames.add(dictionaryName);
+                }
+            } else if (value instanceof Map) {
+                dictionaryNames.addAll(collectDictionaryNames((Map<String, Object>) value));
+            }
+        }
+        return dictionaryNames;
+    }
+
+    private boolean isLink(String value) {
+        return value.startsWith(LINK_START) && value.endsWith(LINK_END);
     }
 }

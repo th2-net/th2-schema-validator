@@ -30,5 +30,4 @@ public class StringUtils {
                 resource.getMetadata().getName()
         );
     }
-
 }

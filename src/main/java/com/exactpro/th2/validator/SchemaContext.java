@@ -20,6 +20,7 @@ import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.enums.ValidationResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 public class SchemaContext {
@@ -50,7 +51,15 @@ public class SchemaContext {
         return allBoxes.get(boxName);
     }
 
-    public RepositoryResource getDictionary(String dictionaryName) {
+    public Collection<RepositoryResource> getAllBoxes() {
+        return allBoxes.values();
+    }
+
+    public boolean dictionaryExists(String dictionaryName) {
+        return getDictionary(dictionaryName) != null;
+    }
+
+    private RepositoryResource getDictionary(String dictionaryName) {
         return dictionaries.get(dictionaryName);
     }
 

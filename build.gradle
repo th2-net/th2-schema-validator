@@ -149,6 +149,9 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.9'
     implementation "com.exactpro.th2:infra-repo:${infra_repo_version}"
     implementation "io.fabric8:kubernetes-client:${fabric_version}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 }
 
 jar {

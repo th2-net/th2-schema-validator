@@ -23,7 +23,7 @@ import com.exactpro.th2.validator.chain.impl.ResourceExists;
 import com.exactpro.th2.validator.enums.BoxDirection;
 import com.exactpro.th2.validator.enums.SchemaConnectionType;
 import com.exactpro.th2.validator.enums.ValidationResult;
-import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
+import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.link.Endpoint;
 import com.exactpro.th2.validator.model.link.MessageLink;
@@ -65,7 +65,7 @@ class GrpcLinkValidator extends BoxesLinkValidator {
             var schemaValidationContext = schemaContext.getSchemaValidationContext();
             schemaValidationContext.setInvalidResource(resName);
             schemaValidationContext.addLinkErrorMessage(resName,
-                    new BoxLinkErrorMessage(
+                    new LinkErrorMessage(
                             link.getContent(),
                             String.format("Exception: %s", e.getMessage())
                     )

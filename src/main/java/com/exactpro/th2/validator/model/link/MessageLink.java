@@ -16,7 +16,6 @@
 
 package com.exactpro.th2.validator.model.link;
 
-import com.exactpro.th2.validator.errormessages.BoxLinkErrorMessage;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.exactpro.th2.validator.model.pin.LinkToEndpoint;
 
@@ -53,7 +52,7 @@ public final class MessageLink implements IdentifiableLink {
 
     @Override
     public LinkErrorMessage errorMessage(String message) {
-        return new BoxLinkErrorMessage(
+        return new LinkErrorMessage(
                 getContent(),
                 message
         );
@@ -63,7 +62,6 @@ public final class MessageLink implements IdentifiableLink {
         return this.from;
     }
 
-    @Override
     public String getFromBox() {
         return getFrom().getBox();
     }
