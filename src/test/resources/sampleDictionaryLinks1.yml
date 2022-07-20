@@ -1,0 +1,11 @@
+customConfig:
+  subStructure:
+    lonely_link: "${dictionary_link:d2}"
+    oneMap:
+      link_1: "${dictionary_link:d1}"
+      link_2: "${dictionary_link:d2}"
+      link_3: "${dictionary_link:invalid1}"
+      link_4: "${dictionary_link:invalid2}"
+    secondMap:
+      link_1: "${dictionary_link:d1}"
+      link_2: "${dictionary_link:invalid1}"

@@ -125,10 +125,6 @@ public class SchemaValidator {
                 distinctLinks(links.getRouterMq(), schemaValidationContext));
         links.setRouterGrpc(
                 distinctLinks(links.getRouterGrpc(), schemaValidationContext));
-        /*spec.setDictionariesRelation(
-                distinctLinks(linkResName, spec.getDictionariesRelation(), schemaValidationContext));
-        spec.setMultiDictionaryRelation(
-                distinctLinks(linkResName, spec.getMultiDictionaryRelation(), schemaValidationContext));*/
     }
 
     private static List<MessageLink> linksWithDifferingEndpoints(
@@ -158,20 +154,23 @@ public class SchemaValidator {
     private static void validateLinks(String schemaName,
                                       SchemaValidationContext schemaValidationContext,
                                       Map<String, Map<String, RepositoryResource>> repositoryMap) {
-        BoxesRelation links = arrangeBoxLinks(collectAllBoxes(repositoryMap).values());
+
+        Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
+        Collection<RepositoryResource> boxes = boxesMap.values();
+
+        BoxesRelation links = arrangeBoxLinks(boxes);
         Map<String, RepositoryResource> dictionaries = repositoryMap.get(ResourceType.Th2Dictionary.kind());
 
         SchemaContext schemaContext = new SchemaContext(
                 schemaName,
-                collectAllBoxes(repositoryMap),
+                boxesMap,
                 dictionaries,
                 schemaValidationContext
         );
 
         var mqLinkValidator = new MqLinkValidator(schemaContext);
         var grpcLinkValidator = new GrpcLinkValidator(schemaContext);
-        /*var dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
-        var multiDictionaryLinkValidator = new MultiDictionaryLinkValidator(schemaContext);*/
+        var dictionaryLinkValidator = new DictionaryLinkValidator(schemaContext);
 
         removeDuplicateLinks(links, schemaValidationContext);
         removeLinksWithSameEndpoints(links, schemaValidationContext);
@@ -179,15 +178,12 @@ public class SchemaValidator {
         for (MessageLink mqLink : links.getRouterMq()) {
             mqLinkValidator.validateLink(mqLink);
         }
+
         for (MessageLink grpcLink : links.getRouterGrpc()) {
             grpcLinkValidator.validateLink(grpcLink);
         }
-        /*for (DictionaryLink dictionaryLink : spec.getDictionariesRelation()) {
-            dictionaryLinkValidator.validateLink(linkRes, dictionaryLink);
-        }
-        for (MultiDictionaryLink multiDictionaryLink : spec.getMultiDictionaryRelation()) {
-            multiDictionaryLinkValidator.validateLink(linkRes, multiDictionaryLink);
-        }*/
+
+        dictionaryLinkValidator.validateLinks();
     }
 
     private static BoxesRelation arrangeBoxLinks(Collection<RepositoryResource> boxes) {

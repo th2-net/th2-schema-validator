@@ -23,7 +23,5 @@ public interface IdentifiableLink {
 
     String getResourceName();
 
-    String getFromBox();
-
     LinkErrorMessage errorMessage(String message);
 }

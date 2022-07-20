@@ -16,7 +16,7 @@
 
 package com.exactpro.th2.validator.errormessages;
 
-public abstract class LinkErrorMessage implements PrintableMessage {
+public class LinkErrorMessage implements PrintableMessage {
 
     private final String linkContent;
 
@@ -33,5 +33,11 @@ public abstract class LinkErrorMessage implements PrintableMessage {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toPrintableMessage() {
+        return String.format("Link: %s is invalid. %s",
+                getLinkContent(), getMessage());
     }
 }
