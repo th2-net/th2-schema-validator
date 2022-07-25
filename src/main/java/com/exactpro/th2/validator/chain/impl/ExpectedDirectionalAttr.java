@@ -51,11 +51,10 @@ public final class ExpectedDirectionalAttr extends AbstractValidator {
                 break;
 
             case from:
-                if (!pin.getAttributes().contains(publish.name())
-                        || pin.getAttributes().contains(subscribe.name())) {
+                if (pin.getAttributes().contains(subscribe.name())) {
                     return ValidationResult.invalid(
-                            format("Invalid pin: \"%s\". must not contain attribute: [%s] and must contain [%s]",
-                                    pin.getName(), subscribe.name(), publish.name())
+                            format("Invalid pin: \"%s\". must not contain attribute: [%s]",
+                                    pin.getName(), subscribe.name())
                     );
                 }
                 break;
