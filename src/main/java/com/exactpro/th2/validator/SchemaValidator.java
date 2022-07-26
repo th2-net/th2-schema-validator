@@ -30,11 +30,13 @@ import com.exactpro.th2.validator.util.SourceHashUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Secret;
-
 import java.util.*;
 
+import static com.exactpro.th2.validator.PinsValidator.removeDuplicatePins;
 import static com.exactpro.th2.validator.UrlPathConflicts.detectUrlPathsConflicts;
 import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
+import static com.exactpro.th2.validator.util.ResourceUtils.getSection;
+import static com.exactpro.th2.validator.util.ResourceUtils.getSectionArray;
 import static com.exactpro.th2.validator.util.SecretsUtils.extractCustomConfig;
 import static com.exactpro.th2.validator.util.SecretsUtils.generateSecretsConfig;
 
@@ -48,10 +50,13 @@ public class SchemaValidator {
                                                    Map<String, Map<String, RepositoryResource>> repositoryMap) {
         SchemaValidationContext schemaValidationContext = new SchemaValidationContext();
         try {
-            detectUrlPathsConflicts(schemaValidationContext, collectAllBoxes(repositoryMap));
+            Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
+            Collection<RepositoryResource> boxes = boxesMap.values();
 
+            detectUrlPathsConflicts(schemaValidationContext, boxesMap);
+            removeDuplicatePins(boxes);
             validateLinks(schemaName, schemaValidationContext, repositoryMap);
-            validateSecrets(schemaName, namespacePrefix, schemaValidationContext, repositoryMap);
+            validateSecrets(schemaName, namespacePrefix, schemaValidationContext, boxes);
         } catch (Exception e) {
             schemaValidationContext.addExceptionMessage(e.getMessage());
             return schemaValidationContext;
@@ -62,12 +67,8 @@ public class SchemaValidator {
     private static void validateSecrets(String schemaName,
                                         String namespacePrefix,
                                         SchemaValidationContext schemaValidationContext,
-                                        Map<String, Map<String, RepositoryResource>> repositoryMap) {
-        Map<String, RepositoryResource> boxes = repositoryMap.get(ResourceType.Th2Box.kind());
-        Map<String, RepositoryResource> coreBoxes = repositoryMap.get(ResourceType.Th2CoreBox.kind());
+                                        Collection<RepositoryResource> allBoxes) {
         String namespace = namespacePrefix + schemaName;
-        List<RepositoryResource> allBoxes = new ArrayList<>(boxes.values());
-        allBoxes.addAll(coreBoxes.values());
         if (SecretsUtils.namespaceNotPresent(namespace)) {
             return;
         }
@@ -297,13 +298,5 @@ public class SchemaValidator {
             }
         }
         return linkFulSubs;
-    }
-
-    private static Map<String, Object> getSection(Map<String, Object> parent, String sectionName) {
-        return parent != null ? (Map<String, Object>) parent.get(sectionName) : null;
-    }
-
-    private static List<Map<String, Object>> getSectionArray(Map<String, Object> parent, String sectionName) {
-        return parent != null ? (List<Map<String, Object>>) parent.get(sectionName) : null;
     }
 }

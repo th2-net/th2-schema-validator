@@ -19,7 +19,7 @@ package com.exactpro.th2.validator.model.pin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GrpcSection {
+public final class GrpcSection {
     private List<GrpcClientPin> client = new ArrayList<>();
 
     private List<GrpcServerPin> server = new ArrayList<>();
