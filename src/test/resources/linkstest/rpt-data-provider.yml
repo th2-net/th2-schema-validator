@@ -1,0 +1,45 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2CoreBox
+metadata:
+  name: rpt-data-provider
+spec:
+  pins:
+    mq:
+      subscribers:
+        - name: from_codec
+          attributes:
+            - from_codec
+            - parsed
+            - subscribe
+          linkTo:
+            - box: codec-fix
+              pin: out_codec_general_decode
+            - box: codec-fix
+              pin: in_codec_encode
+            - box: fake
+              pin: fake_pin
+            - box: codec-fix
+              pin: out_codec_general_decode
+            - box: rpt-data-provider
+              pin: not_exist
+      publishers:
+        - name: to_codec_fix
+          attributes:
+            - to_codec
+            - raw
+            - publish
+            - fix-demo-server1
+            - fix-demo-server2
+            - dc-demo-server1
+            - fix-demo-server2
+            - demo-conn1
+            - demo-conn2
+            - demo-dc1
+            - demo-dc2
+            - demo-log
+        - name: to_codec_csv
+          attributes:
+            - to_codec
+            - raw
+            - publish
+            - demo-csv

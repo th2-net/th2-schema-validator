@@ -1,0 +1,55 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: codec-fix
+spec:
+  pins:
+    mq:
+      subscribers:
+        - name: in_codec_encode
+          attributes:
+            - encoder_in
+            - parsed
+            - subscribe
+          linkTo:
+            - box: act-fix
+              pin: to_send
+        - name: in_codec_decode
+          attributes:
+            - decoder_in
+            - raw
+            - subscribe
+        - name: in_codec_general_encode
+          attributes:
+            - general_encoder_in
+            - parsed
+            - subscribe
+        - name: in_codec_general_decode
+          attributes:
+            - general_decoder_in
+            - raw
+            - subscribe
+          linkTo:
+            - box: rpt-data-provider
+              pin: to_codec_fix
+      publishers:
+        - name: out_codec_encode
+          attributes:
+            - encoder_out
+            - raw
+            - publish
+        - name: out_codec_decode
+          attributes:
+            - decoder_out
+            - parsed
+            - publish
+        - name: out_codec_general_encode
+          attributes:
+            - general_encoder_out
+            - raw
+            - publish
+        - name: out_codec_general_decode
+          attributes:
+            - general_decoder_out
+            - parsed
+            - publish

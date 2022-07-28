@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.exactpro.th2.validator.enums.ValidationStatus.INVALID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DictionaryLinkValidatorTests {
@@ -51,7 +50,7 @@ class DictionaryLinkValidatorTests {
             "d3", new RepositoryResource(API, DICTIONARY_TYPE, new GenericResource.Metadata("d3"), "d3Spec")
     );
 
-    private static final String LINKS_FILE = "src/test/resources/sampleDictionaryLinks1.yml";
+    private static final String LINKS_FILE = "src/test/resources/sampleDictionaryLinks.yml";
 
     @Test
     void testValidationOfFlatStructure() {
@@ -83,8 +82,9 @@ class DictionaryLinkValidatorTests {
 
         var validator = new DictionaryLinkValidator(schemaContext);
         validator.validateLinks();
-        assertEquals(INVALID, schemaValidationContext.getResource("box1").getStatus());
-        assertEquals(INVALID, schemaValidationContext.getResource("box2").getStatus());
+        assertTrue(schemaValidationContext.getResource("box1").isInvalid());
+        assertTrue(schemaValidationContext.getResource("box1").isInvalid());
+
         Map<String, List<LinkErrorMessage>> errors = schemaValidationContext.getReport().getLinkErrorMessages();
         List<LinkErrorMessage> box1Errors = errors.get("box1");
 

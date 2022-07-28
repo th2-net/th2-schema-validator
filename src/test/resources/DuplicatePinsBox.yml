@@ -1,0 +1,45 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: test_box
+spec:
+  pins:
+    mq:
+      subscribers:
+        - name: sub_pin
+          attributes:
+            - subscribe
+            - parsed
+          filters:
+            - metadata:
+                - expectedValue: expected
+                  fieldName: fieldname
+                  operation: EQUAL
+        - name: sub_pin
+          attributes:
+            - raw
+            - subscribe
+        - name: unique_sub
+      publishers:
+        - name: pub_pin
+          attributes:
+            - publisher
+            - raw
+        - name: pub_pin
+          attributes:
+            - publisher
+            - raw
+        - name: unique_pub
+    grpc:
+      client:
+        - name: unique_client
+          serviceClass: class
+      server:
+        - name: server_pin
+          serviceClasses: classes
+        - name: server_pin
+          serviceClasses: classes
+        - name: server_pin
+        - name: unique_server
+        - name: unique_server_1
+

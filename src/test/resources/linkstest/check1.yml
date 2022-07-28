@@ -1,0 +1,22 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: check1
+spec:
+  pins:
+    mq:
+      subscribers:
+        - name: from_codec
+          attributes:
+            - subscribe
+            - parsed
+          linkTo:
+            - box: codec-fix
+              pin: out_codec_decode
+    grpc:
+      client:
+        - name: client
+      server:
+        - name: server
+          serviceClasses:
+            - com.exactpro.th2.check1.grpc.Check1Service

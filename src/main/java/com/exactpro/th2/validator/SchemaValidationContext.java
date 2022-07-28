@@ -22,6 +22,8 @@ import com.exactpro.th2.validator.model.link.MessageLink;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SchemaValidationContext {
 
@@ -37,6 +39,12 @@ public class SchemaValidationContext {
 
     public ValidationReport getReport() {
         return report;
+    }
+
+    public Set<String> getInvalidResources() {
+        return resources.keySet().stream()
+                .filter(name -> resources.get(name).isInvalid())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     public void setInvalidResource(String resourceName) {
