@@ -16,16 +16,30 @@
 
 package com.exactpro.th2.validator.util;
 
+import com.exactpro.th2.infrarepo.ResourceType;
+import com.exactpro.th2.infrarepo.repo.RepositoryResource;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public class ResourceUtils {
+public final class ResourceUtils {
     public static Map<String, Object> getSection(Map<String, Object> parent, String sectionName) {
         return parent != null ? (Map<String, Object>) parent.get(sectionName) : null;
     }
 
     public static List<Map<String, Object>> getSectionArray(Map<String, Object> parent, String sectionName) {
         return parent != null ? (List<Map<String, Object>>) parent.get(sectionName) : null;
+    }
+
+    public static Map<String, RepositoryResource> collectAllBoxes(
+            Map<String, Map<String, RepositoryResource>> repositoryMap
+    ) {
+        Map<String, RepositoryResource> boxes = repositoryMap.get(ResourceType.Th2Box.kind());
+        Map<String, RepositoryResource> coreBoxes = repositoryMap.get(ResourceType.Th2CoreBox.kind());
+        Map<String, RepositoryResource> allBoxes = new HashMap<>(boxes);
+        allBoxes.putAll(coreBoxes);
+        return allBoxes;
     }
 }

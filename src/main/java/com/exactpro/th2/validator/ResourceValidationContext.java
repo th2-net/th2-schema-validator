@@ -53,4 +53,8 @@ public class ResourceValidationContext {
     public ValidationStatus getStatus() {
         return status;
     }
+
+    public boolean isInvalid() {
+        return status == ValidationStatus.INVALID;
+    }
 }

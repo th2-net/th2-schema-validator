@@ -1,0 +1,11 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: test_box
+spec:
+  pins:
+    grpc:
+      client:
+        - name: unique_client
+          serviceClass: class
+

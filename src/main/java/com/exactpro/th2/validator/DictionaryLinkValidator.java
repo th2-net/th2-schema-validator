@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("unchecked")
-public class DictionaryLinkValidator {
+class DictionaryLinkValidator {
     private final SchemaContext schemaContext;
 
     private static final String LINK_START = "${dictionary_link:";

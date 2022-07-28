@@ -18,6 +18,8 @@ package com.exactpro.th2.validator.model.pin;
 
 import com.exactpro.th2.validator.model.link.LinkMeta;
 
+import java.util.Objects;
+
 public final class LinkToEndpoint {
     private String box;
 
@@ -50,5 +52,22 @@ public final class LinkToEndpoint {
         return new LinkMeta(toBoxName, String.format(CONTENT_TEMPLATE,
                 box, pin,
                 toBoxName, toPinName));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof LinkToEndpoint)) {
+            return false;
+        }
+        LinkToEndpoint that = (LinkToEndpoint) o;
+        return getBox().equals(that.getBox()) && getPin().equals(that.getPin());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBox(), getPin());
     }
 }
