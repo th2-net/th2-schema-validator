@@ -35,7 +35,7 @@ class PinsValidator {
             Map<String, Object> pinSpec = getSection(spec, "pins");
             Map<String, Object> mq = getSection(pinSpec, "mq");
             Map<String, Object> grpc = getSection(pinSpec, "grpc");
-            String boxName = box.getMetadata().getName();
+            final String boxName = box.getMetadata().getName();
 
             putUniquePinsInSection(mq, "subscribers", boxName);
 

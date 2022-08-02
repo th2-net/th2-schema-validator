@@ -20,6 +20,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class SourceHashUtil {
+    private SourceHashUtil() {}
 
     public static String digest(String data) {
         try {
