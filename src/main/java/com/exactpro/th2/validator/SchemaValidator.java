@@ -116,6 +116,10 @@ public class SchemaValidator {
                 continue;
             }
             var spec = (Map<String, Object>) box.getSpec();
+            if (spec == null) {
+                continue;
+            }
+
             Map<String, Object> pinSpec = getSection(spec, "pins");
             Map<String, Object> mq = getSection(pinSpec, "mq");
             List<Map<String, Object>> subscribersSection = getSectionArray(mq, "subscribers");

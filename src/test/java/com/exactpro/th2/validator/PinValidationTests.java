@@ -67,12 +67,17 @@ class PinValidationTests {
 
     @Test
     void testDuplicatePinsValidationNullSafety() throws IOException {
-        final var duplicatePinsBoxFile = new File(PATH + "BoxWithEmptySubsections.yml");
-        var box = mapper.readValue(duplicatePinsBoxFile, RepositoryResource.class);
-        assertDoesNotThrow(() -> PinsValidator.removeDuplicatePins(List.of(box)));
+        final var noSpecBoxFile = new File(PATH + "NoSpecBox.yml");
+        var noSpecBox = mapper.readValue(noSpecBoxFile, RepositoryResource.class);
+
+        final var emptySubsectionsBoxFile = new File(PATH + "BoxWithEmptySubsections.yml");
+        var emptySubsectionsBox = mapper.readValue(emptySubsectionsBoxFile, RepositoryResource.class);
+
         final var emptyMqPinsBoxFile = new File(PATH + "BoxWithEmptySection.yml");
         var emptyMqPinsBox = mapper.readValue(emptyMqPinsBoxFile, RepositoryResource.class);
-        assertDoesNotThrow(() -> PinsValidator.removeDuplicatePins(List.of(emptyMqPinsBox)));
+
+        assertDoesNotThrow(() -> PinsValidator.removeDuplicatePins(List.of(
+                noSpecBox, emptySubsectionsBox, emptyMqPinsBox)));
     }
 
     private Set<String> collectPinNames(List<Map<String, Object>> pins) {

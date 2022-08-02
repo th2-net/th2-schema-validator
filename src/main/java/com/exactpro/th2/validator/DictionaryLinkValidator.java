@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.exactpro.th2.validator.util.ResourceUtils.getSection;
+
 @SuppressWarnings("unchecked")
 class DictionaryLinkValidator {
     private final SchemaContext schemaContext;
@@ -39,7 +41,7 @@ class DictionaryLinkValidator {
 
         for (var box : schemaContext.getAllBoxes()) {
             var spec = (Map<String, Object>) box.getSpec();
-            var customConfig = (Map<String, Object>) spec.get("customConfig");
+            Map<String, Object> customConfig = getSection(spec, "customConfig");
             if (customConfig == null) {
                 continue;
             }

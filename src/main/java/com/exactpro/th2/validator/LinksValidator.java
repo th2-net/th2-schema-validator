@@ -45,7 +45,7 @@ class LinksValidator {
         BoxesRelation links = arrangeBoxLinks(boxes);
         Map<String, RepositoryResource> dictionaries = repositoryMap.get(ResourceType.Th2Dictionary.kind());
 
-        SchemaContext schemaContext = new SchemaContext(
+        var schemaContext = new SchemaContext(
                 schemaName,
                 boxesMap,
                 dictionaries,
@@ -79,9 +79,12 @@ class LinksValidator {
         var boxesRelation = new BoxesRelation();
 
         for (var box : boxes) {
-            String boxName = box.getMetadata().getName();
             Th2Spec boxSpec = mapper.convertValue(box.getSpec(), Th2Spec.class);
+            if (boxSpec == null) {
+                continue;
+            }
 
+            final String boxName = box.getMetadata().getName();
             List<MqSubscriberPin> subscribers = boxSpec.getMqSubscribers();
             for (var sub : subscribers) {
                 List<LinkToEndpoint> linkTo = sub.getLinkTo();
@@ -94,7 +97,6 @@ class LinksValidator {
             }
 
             List<GrpcClientPin> clients = boxSpec.getGrpcClientPins();
-
             for (var client : clients) {
                 List<LinkToEndpoint> linkTo = client.getLinkTo();
                 String pinName = client.getName();

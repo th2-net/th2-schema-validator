@@ -100,7 +100,7 @@ class DictionaryLinkValidatorTests {
     @Test
     void testValidationOfNestedStructure() throws IOException {
         var schemaValidationContext = new SchemaValidationContext();
-        YAMLMapper mapper = new YAMLMapper();
+        var mapper = new YAMLMapper();
 
         Object box1Spec = mapper.readValue(new File(LINKS_FILE), Object.class);
 
@@ -128,5 +128,23 @@ class DictionaryLinkValidatorTests {
         assertEquals(2, box1ErrorsContents.size());
         assertTrue(box1ErrorsContents.contains(new DictionaryLink("box1", "invalid1").getContent()));
         assertTrue(box1ErrorsContents.contains(new DictionaryLink("box1", "invalid2").getContent()));
+    }
+
+    @Test
+    void testValidationNullSafety() throws IOException {
+        var schemaValidationContext = new SchemaValidationContext();
+        var mapper = new YAMLMapper();
+        final var noSpecBoxFile = new File("src/test/resources/NoSpecBox.yml");
+
+        var noSpecBox = mapper.readValue(noSpecBoxFile, RepositoryResource.class);
+        var schemaContext = new SchemaContext(
+                SCHEMA,
+                Map.of("NoSpecBox", noSpecBox),
+                dictionaries,
+                schemaValidationContext
+        );
+
+        var validator = new DictionaryLinkValidator(schemaContext);
+        assertDoesNotThrow(validator::validateLinks);
     }
 }

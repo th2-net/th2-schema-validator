@@ -29,9 +29,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SecretsUtils {
+import static com.exactpro.th2.validator.util.ResourceUtils.getSection;
 
+@SuppressWarnings("unchecked")
+public class SecretsUtils {
     public static final String DEFAULT_SECRET_NAME = "secret-custom-config";
+
+    private SecretsUtils() {}
 
     public static Secret getCustomSecret(String namespace) {
         KubernetesClient kubernetesClient = new DefaultKubernetesClient();
@@ -46,9 +50,9 @@ public class SecretsUtils {
     }
 
     public static Map<String, Object> extractCustomConfig(RepositoryResource resource) {
-        String customConfigAlias = "custom-config";
-        Map<String, Object> spec = (Map<String, Object>) resource.getSpec();
-        return (Map<String, Object>) spec.get(customConfigAlias);
+        String customConfigAlias = "customConfig";
+        var spec = (Map<String, Object>) resource.getSpec();
+        return getSection(spec, customConfigAlias);
     }
 
     public static Set<String> generateSecretsConfig(Map<String, Object> customConfig) {

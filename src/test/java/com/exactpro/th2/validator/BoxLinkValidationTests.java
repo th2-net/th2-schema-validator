@@ -32,8 +32,7 @@ import java.util.stream.Collectors;
 
 import static com.exactpro.th2.validator.enums.ValidationStatus.INVALID;
 import static com.exactpro.th2.validator.util.ResourceUtils.collectAllBoxes;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoxLinkValidationTests {
     private static final ObjectMapper mapper = new YAMLMapper();
@@ -142,6 +141,19 @@ class BoxLinkValidationTests {
         List<LinkToEndpoint> actualRptLinkTo = rptSpec.getMqSubscribers().get(0).getLinkTo();
         assertEquals(expectedRptLinkTo, actualRptLinkTo);
 
+    }
+
+    @Test
+    void testSpecNullSafety() throws IOException {
+        final var noSpecBoxFile = new File("src/test/resources/NoSpecBox.yml");
+        var noSpecBox = mapper.readValue(noSpecBoxFile, RepositoryResource.class);
+        Map<String, Map<String, RepositoryResource>> repoMap = Map.of(
+                ResourceType.Th2Box.kind(), Map.of("NoSpecBox", noSpecBox)
+        );
+        Map<String, RepositoryResource> boxMap = collectAllBoxes(repoMap);
+        var validationContext = new SchemaValidationContext();
+        assertDoesNotThrow(() -> LinksValidator.validateLinks(SCHEMA, validationContext, repoMap));
+        assertDoesNotThrow(() -> SchemaValidator.removeInvalidLinks(validationContext, boxMap.values()));
     }
 
     private Set<String> collectLinkContents(String resName, Map<String, List<LinkErrorMessage>> errors) {

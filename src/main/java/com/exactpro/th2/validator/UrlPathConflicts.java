@@ -21,6 +21,8 @@ import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 
 import java.util.*;
 
+import static com.exactpro.th2.validator.util.ResourceUtils.getSection;
+
 public class UrlPathConflicts {
 
     public static void detectUrlPathsConflicts(SchemaValidationContext schemaValidationContext,
@@ -73,6 +75,7 @@ public class UrlPathConflicts {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, Set<String>> getRepositoryUrlPaths(SchemaValidationContext schemaValidationContext,
                                                                   Map<String, RepositoryResource> resources
     ) {
@@ -82,26 +85,14 @@ public class UrlPathConflicts {
             String resourceName = resource.getMetadata().getName();
             try {
                 var spec = (Map<String, Object>) resource.getSpec();
-                if (spec == null) {
-                    continue;
-                }
-
-                var settings = (Map<String, Object>) spec.get("extendedSettings");
-                if (settings == null) {
-                    continue;
-                }
-
-                var service = (Map<String, Object>) settings.get("service");
-                if (service == null) {
-                    continue;
-                }
-
-                var ingress = (Map<String, Object>) service.get("ingress");
+                Map<String, Object> settings = getSection(spec, "extendedSettings");
+                Map<String, Object> service = getSection(settings, "service");
+                Map<String, Object> ingress = getSection(service, "ingress");
                 if (ingress == null) {
                     continue;
                 }
 
-                List<String> urls = (List<String>) ingress.get("urlPaths");
+                var urls = (List<String>) ingress.get("urlPaths");
                 if (urls == null || urls.isEmpty()) {
                     continue;
                 }
