@@ -19,6 +19,8 @@ package com.exactpro.th2.validator.util;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 
 public class StringUtils {
+    private StringUtils() {}
+
     public static String annotationFor(String namespace, String kind, String resourceName) {
         return String.format("%s:%s/%s", namespace, kind, resourceName);
     }
