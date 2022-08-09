@@ -17,11 +17,12 @@
 package com.exactpro.th2.validator;
 
 import com.exactpro.th2.infrarepo.ResourceType;
-import com.exactpro.th2.infrarepo.repo.GenericResource;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 import com.exactpro.th2.validator.model.link.DictionaryLink;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -44,13 +45,22 @@ class DictionaryLinkValidatorTests {
 
     private static final String SCHEMA = "schema";
 
-    private static final Map<String, RepositoryResource> dictionaries = Map.of(
-            "d1", new RepositoryResource(API, DICTIONARY_TYPE, new GenericResource.Metadata("d1"), null),
-            "d2", new RepositoryResource(API, DICTIONARY_TYPE, new GenericResource.Metadata("d2"), null),
-            "d3", new RepositoryResource(API, DICTIONARY_TYPE, new GenericResource.Metadata("d3"), "d3Spec")
-    );
+    private static final Map<String, RepositoryResource> dictionaries = new HashMap<>();
 
     private static final String LINKS_FILE = "src/test/resources/sampleDictionaryLinks.yml";
+
+    @BeforeAll
+    static void prepareDictionaries() {
+        ObjectMeta metadata1 = new ObjectMeta();
+        metadata1.setName("d1");
+        ObjectMeta metadata2 = new ObjectMeta();
+        metadata2.setName("d2");
+        ObjectMeta metadata3 = new ObjectMeta();
+        metadata3.setName("d3");
+        dictionaries.put("d1", new RepositoryResource(API, DICTIONARY_TYPE, metadata1, null));
+        dictionaries.put("d2", new RepositoryResource(API, DICTIONARY_TYPE, metadata2, null));
+        dictionaries.put("d3", new RepositoryResource(API, DICTIONARY_TYPE, metadata3, "d3Spec"));
+    }
 
     @Test
     void testValidationOfFlatStructure() {
@@ -68,10 +78,14 @@ class DictionaryLinkValidatorTests {
         box1Spec.get(CUSTOM_CONFIG).put("invalidLink", "${dictionary_link:null}");
 
         box2Spec.computeIfAbsent(CUSTOM_CONFIG, customConfig -> new HashMap<>())
-                        .put("invalidLink", "${dictionary_link:d9}");
+                .put("invalidLink", "${dictionary_link:d9}");
 
-        boxes.put("box1", new RepositoryResource(API, BOX_TYPE, new GenericResource.Metadata("box1"), box1Spec));
-        boxes.put("box2", new RepositoryResource(API, BOX_TYPE, new GenericResource.Metadata("box2"), box2Spec));
+        ObjectMeta metadata1 = new ObjectMeta();
+        metadata1.setName("box1");
+        ObjectMeta metadata2 = new ObjectMeta();
+        metadata2.setName("box2");
+        boxes.put("box1", new RepositoryResource(API, BOX_TYPE, metadata1, box1Spec));
+        boxes.put("box2", new RepositoryResource(API, BOX_TYPE, metadata2, box2Spec));
 
         var schemaContext = new SchemaContext(
                 SCHEMA,
@@ -105,7 +119,9 @@ class DictionaryLinkValidatorTests {
         Object box1Spec = mapper.readValue(new File(LINKS_FILE), Object.class);
 
         Map<String, RepositoryResource> boxes = new HashMap<>();
-        boxes.put("box1", new RepositoryResource(API, BOX_TYPE, new GenericResource.Metadata("box1"), box1Spec));
+        ObjectMeta metadata1 = new ObjectMeta();
+        metadata1.setName("box1");
+        boxes.put("box1", new RepositoryResource(API, BOX_TYPE, metadata1, box1Spec));
 
         var schemaContext = new SchemaContext(
                 SCHEMA,
