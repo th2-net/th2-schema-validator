@@ -1,0 +1,8 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: empty
+spec:
+  extendedSettings:
+    service:
+      enabled: false

@@ -29,7 +29,6 @@ public class UrlPathConflicts {
                                                Map<String, RepositoryResource> repositoryResources
     ) {
 
-        // get map of resource label and url paths pairs
         Map<String, Set<String>> repositoryUrlPaths = getRepositoryUrlPaths(
                 schemaValidationContext,
                 repositoryResources
@@ -39,23 +38,22 @@ public class UrlPathConflicts {
             return;
         }
 
-        Set<String> entries = new HashSet<>();
+        Set<String> resourceNames = new HashSet<>();
 
-        // detect conflicts, if any
         for (var entry1 : repositoryUrlPaths.entrySet()) {
-            entries.add(entry1.getKey());
+            resourceNames.add(entry1.getKey());
+            final Set<String> urls = Collections.unmodifiableSet(entry1.getValue());
 
             for (var entry2 : repositoryUrlPaths.entrySet()) {
                 // avoid comparing resource with itself and comparing the same resources twice
-                if (entries.contains(entry2.getKey())) {
+                if (resourceNames.contains(entry2.getKey())) {
                     continue;
                 }
 
                 List<String> duplicated = new ArrayList<>();
-                Set<String> checker = new HashSet<>(entry1.getValue());
-                // use the set 'checker' to detect url duplications between resources
+
                 for (String url : entry2.getValue()) {
-                    if (checker.contains(url)) {
+                    if (urls.contains(url)) {
                         duplicated.add(url);
                     }
                 }
@@ -79,7 +77,7 @@ public class UrlPathConflicts {
     private static Map<String, Set<String>> getRepositoryUrlPaths(SchemaValidationContext schemaValidationContext,
                                                                   Map<String, RepositoryResource> resources
     ) {
-        Map<String, Set<String>> map = new HashMap<>();
+        Map<String, Set<String>> resToUrlPaths = new HashMap<>();
         for (RepositoryResource resource : resources.values()) {
 
             String resourceName = resource.getMetadata().getName();
@@ -98,20 +96,18 @@ public class UrlPathConflicts {
                 }
 
                 Set<String> urlPaths = new HashSet<>();
-                Set<String> duplicated = new HashSet<>();
-                // use the set 'urlPaths' to detect url duplication in a resource
+                boolean isDuplicated = false;
+
                 for (String url : urls) {
                     if (!urlPaths.add(url)) {
-                        duplicated.add(url);
+                        isDuplicated = true;
                     }
                 }
 
-                if (!duplicated.isEmpty()) {
-                    // put fixed urlPaths property in the resource
+                if (isDuplicated) {
                     ingress.put("urlPaths", new ArrayList<>(urlPaths));
                 }
-                // collect resources that contain url paths
-                map.put(resourceName, urlPaths);
+                resToUrlPaths.put(resourceName, urlPaths);
 
             } catch (ClassCastException e) {
                 String message = String.format("Exception extracting urlPaths property. exception: %s", e.getMessage());
@@ -125,6 +121,6 @@ public class UrlPathConflicts {
             }
         }
 
-        return map;
+        return resToUrlPaths;
     }
 }

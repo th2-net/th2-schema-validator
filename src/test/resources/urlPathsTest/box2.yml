@@ -1,0 +1,15 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: box2
+spec:
+  extendedSettings:
+    service:
+      enabled: false
+      ingress:
+        urlPaths:
+          - URL1
+          - URL2
+          - URL2
+          - URL3
+          - URL4
