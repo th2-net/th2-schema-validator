@@ -17,9 +17,6 @@
 package com.exactpro.th2.validator;
 
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
-import com.exactpro.th2.validator.enums.ValidationResult;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -60,17 +57,11 @@ public class SchemaContext {
     }
 
     private RepositoryResource getDictionary(String dictionaryName) {
-        return dictionaries.get(dictionaryName);
+        return dictionaries != null ? dictionaries.get(dictionaryName) : null;
     }
 
     public SchemaValidationContext getSchemaValidationContext() {
         return schemaValidationContext;
     }
 
-    private static class ResourcesList {
-
-        private final ValidationResult result = ValidationResult.valid();
-
-        private final ArrayList<RepositoryResource> linkedResources = new ArrayList<>();
-    }
 }

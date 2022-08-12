@@ -66,7 +66,7 @@ class PinsValidator {
             List<Map<String, Object>> arraySection, String boxName) {
 
         if (arraySection == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<Map<String, Object>> uniquePins = new ArrayList<>();
