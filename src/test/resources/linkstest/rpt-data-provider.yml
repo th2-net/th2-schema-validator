@@ -43,3 +43,9 @@ spec:
             - raw
             - publish
             - demo-csv
+    grpc:
+      server:
+        - name: someServer
+          serviceClasses:
+            - someClasses
+      #client:
