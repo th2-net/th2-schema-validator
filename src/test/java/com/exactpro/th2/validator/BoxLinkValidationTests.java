@@ -87,7 +87,8 @@ class BoxLinkValidationTests {
     void testValidation() throws IOException {
         Map<String, Map<String, RepositoryResource>> repoMap = initRepositoryMap();
         var validationContext = new SchemaValidationContext();
-        LinksValidator.validateLinks(SCHEMA, validationContext, repoMap);
+        var validator = new LinksValidator(validationContext);
+        validator.validateLinks(SCHEMA, repoMap);
 
         assertEquals(2, validationContext.getInvalidResources().size());
         assertEquals(INVALID, validationContext.getResource(ACT).getStatus());
@@ -120,7 +121,8 @@ class BoxLinkValidationTests {
         Map<String, Map<String, RepositoryResource>> repoMap = initRepositoryMap();
         Map<String, RepositoryResource> boxMap = collectAllBoxes(repoMap);
         var validationContext = new SchemaValidationContext();
-        LinksValidator.validateLinks(SCHEMA, validationContext, repoMap);
+        var validator = new LinksValidator(validationContext);
+        validator.validateLinks(SCHEMA, repoMap);
         SchemaValidator.removeInvalidLinks(validationContext, boxMap.values());
 
         var actSpec = mapper.convertValue(boxMap.get(ACT).getSpec(), Th2Spec.class);
@@ -152,7 +154,8 @@ class BoxLinkValidationTests {
         );
         Map<String, RepositoryResource> boxMap = collectAllBoxes(repoMap);
         var validationContext = new SchemaValidationContext();
-        assertDoesNotThrow(() -> LinksValidator.validateLinks(SCHEMA, validationContext, repoMap));
+        var validator = new LinksValidator(validationContext);
+        assertDoesNotThrow(() -> validator.validateLinks(SCHEMA, repoMap));
         assertDoesNotThrow(() -> SchemaValidator.removeInvalidLinks(validationContext, boxMap.values()));
     }
 

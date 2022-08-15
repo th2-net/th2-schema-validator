@@ -27,8 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.Secret;
 import java.util.*;
 
-import static com.exactpro.th2.validator.LinksValidator.validateLinks;
-import static com.exactpro.th2.validator.PinsValidator.removeDuplicatePins;
 import static com.exactpro.th2.validator.UrlPathConflicts.detectUrlPathsConflicts;
 import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
 import static com.exactpro.th2.validator.util.ResourceUtils.*;
@@ -43,14 +41,16 @@ public class SchemaValidator {
     public static SchemaValidationContext validate(String schemaName,
                                                    String namespacePrefix,
                                                    Map<String, Map<String, RepositoryResource>> repositoryMap) {
-        SchemaValidationContext schemaValidationContext = new SchemaValidationContext();
+        var schemaValidationContext = new SchemaValidationContext();
         try {
             Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
             Collection<RepositoryResource> boxes = boxesMap.values();
 
             detectUrlPathsConflicts(schemaValidationContext, boxesMap);
-            removeDuplicatePins(boxes);
-            validateLinks(schemaName, schemaValidationContext, repositoryMap);
+            var pinsValidator = new PinsValidator(boxes, schemaValidationContext);
+            pinsValidator.removeDuplicatePins();
+            var linksValidator = new LinksValidator(schemaValidationContext);
+            linksValidator.validateLinks(schemaName, repositoryMap);
             validateSecrets(schemaName, namespacePrefix, schemaValidationContext, boxes);
         } catch (Exception e) {
             schemaValidationContext.addExceptionMessage(e.getMessage());

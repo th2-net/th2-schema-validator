@@ -28,7 +28,7 @@ import com.exactpro.th2.validator.model.link.MessageLink;
 
 class MqLinkValidator extends BoxesLinkValidator {
 
-    public MqLinkValidator(SchemaContext schemaContext) {
+    MqLinkValidator(SchemaContext schemaContext) {
         super(schemaContext);
     }
 

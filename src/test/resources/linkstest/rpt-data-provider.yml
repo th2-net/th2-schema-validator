@@ -48,4 +48,4 @@ spec:
         - name: someServer
           serviceClasses:
             - someClasses
-      #client:
+      client:

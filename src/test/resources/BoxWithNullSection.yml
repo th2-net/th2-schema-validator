@@ -1,0 +1,21 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  annotations:
+    key: value
+    key2: value
+  name: boxWithNullSection
+spec:
+  imageName: ghcr.io/th2-net/th2-check1
+  imageVersion: 3.9.0
+  pins:
+    mq:
+      subscribers:
+        - name:
+      publishers:
+    grpc:
+      server:
+        - name: server
+          serviceClasses:
+            - someClasses
+      client:
