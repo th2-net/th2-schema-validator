@@ -32,7 +32,7 @@ import static com.exactpro.th2.validator.util.ResourceUtils.getSectionArray;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unchecked")
-class PinValidationTests {
+class PinsValidationTests {
     private static final YAMLMapper mapper = new YAMLMapper();
 
     private static final String PATH = "src/test/resources/";
@@ -41,7 +41,8 @@ class PinValidationTests {
     void testDuplicatePinsValidation() throws IOException {
         final File duplicatePinsBoxFile = new File(PATH + "DuplicatePinsBox.yml");
         var box = mapper.readValue(duplicatePinsBoxFile, RepositoryResource.class);
-        PinsValidator.removeDuplicatePins(List.of(box));
+        var validator = new PinsValidator(List.of(box), new SchemaValidationContext());
+        validator.removeDuplicatePins();
 
         var spec = (Map<String, Object>) box.getSpec();
         Map<String, Object> pins = getSection(spec, "pins");
@@ -67,17 +68,22 @@ class PinValidationTests {
 
     @Test
     void testDuplicatePinsValidationNullSafety() throws IOException {
-        final var noSpecBoxFile = new File(PATH + "NoSpecBox.yml");
-        var noSpecBox = mapper.readValue(noSpecBoxFile, RepositoryResource.class);
+        RepositoryResource noSpecBox = getBox("NoSpecBox.yml");
 
-        final var emptySubsectionsBoxFile = new File(PATH + "BoxWithEmptySubsections.yml");
-        var emptySubsectionsBox = mapper.readValue(emptySubsectionsBoxFile, RepositoryResource.class);
+        RepositoryResource emptySubsectionsBox = getBox("BoxWithEmptySubsections.yml");
 
-        final var emptyMqPinsBoxFile = new File(PATH + "BoxWithEmptySection.yml");
-        var emptyMqPinsBox = mapper.readValue(emptyMqPinsBoxFile, RepositoryResource.class);
+        RepositoryResource emptyMqPinsBox = getBox("BoxWithEmptySection.yml");
 
-        assertDoesNotThrow(() -> PinsValidator.removeDuplicatePins(List.of(
-                noSpecBox, emptySubsectionsBox, emptyMqPinsBox)));
+        RepositoryResource nullSectionBox = getBox("BoxWithNullSection.yml");
+
+        var validator = new PinsValidator(List.of(
+                noSpecBox, emptySubsectionsBox, emptyMqPinsBox, nullSectionBox),
+                new SchemaValidationContext());
+        assertDoesNotThrow(validator::removeDuplicatePins);
+    }
+
+    private RepositoryResource getBox(String fileName) throws IOException {
+        return mapper.readValue(new File(PATH + fileName), RepositoryResource.class);
     }
 
     private Set<String> collectPinNames(List<Map<String, Object>> pins) {

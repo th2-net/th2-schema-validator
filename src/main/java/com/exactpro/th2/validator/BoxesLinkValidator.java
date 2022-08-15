@@ -33,7 +33,7 @@ abstract class BoxesLinkValidator {
 
     abstract void addValidMessageLink(String linkResName, MessageLink link);
 
-    public BoxesLinkValidator(SchemaContext schemaContext) {
+    BoxesLinkValidator(SchemaContext schemaContext) {
         this.schemaContext = schemaContext;
     }
 

@@ -17,6 +17,7 @@
 package com.exactpro.th2.validator;
 
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
+import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,29 +26,48 @@ import java.util.*;
 import static com.exactpro.th2.validator.util.ResourceUtils.getSection;
 import static com.exactpro.th2.validator.util.ResourceUtils.getSectionArray;
 
+@SuppressWarnings("unchecked")
 class PinsValidator {
     private static final Logger logger = LoggerFactory.getLogger(SchemaValidator.class);
 
-    @SuppressWarnings("unchecked")
-    static void removeDuplicatePins(Collection<RepositoryResource> boxes) {
+    private final Collection<RepositoryResource> boxes;
+
+    private final SchemaValidationContext validationContext;
+
+    PinsValidator(Collection<RepositoryResource> boxes, SchemaValidationContext validationContext) {
+        this.boxes = Collections.unmodifiableCollection(boxes);
+        this.validationContext = validationContext;
+    }
+
+    void removeDuplicatePins() {
         for (var box : boxes) {
-            var spec = (Map<String, Object>) box.getSpec();
-            Map<String, Object> pinSpec = getSection(spec, "pins");
-            Map<String, Object> mq = getSection(pinSpec, "mq");
-            Map<String, Object> grpc = getSection(pinSpec, "grpc");
             final String boxName = box.getMetadata().getName();
+            try {
+                var spec = (Map<String, Object>) box.getSpec();
+                Map<String, Object> pinSpec = getSection(spec, "pins");
+                Map<String, Object> mq = getSection(pinSpec, "mq");
+                Map<String, Object> grpc = getSection(pinSpec, "grpc");
 
-            putUniquePinsInSection(mq, "subscribers", boxName);
+                putUniquePinsInSection(mq, "subscribers", boxName);
 
-            putUniquePinsInSection(mq, "publishers", boxName);
+                putUniquePinsInSection(mq, "publishers", boxName);
 
-            putUniquePinsInSection(grpc, "client", boxName);
+                putUniquePinsInSection(grpc, "client", boxName);
 
-            putUniquePinsInSection(grpc, "server", boxName);
+                putUniquePinsInSection(grpc, "server", boxName);
+            } catch (Exception e) {
+                String message = String.format("Exception occurred during the removal of duplicate pins: %s",
+                        e.getMessage());
+                validationContext.setInvalidResource(boxName);
+                validationContext.addBoxResourceErrorMessages(new BoxResourceErrorMessage(
+                        boxName,
+                        message
+                ));
+            }
         }
     }
 
-    private static void putUniquePinsInSection(
+    private void putUniquePinsInSection(
             Map<String, Object> section, String subSectionName, String boxName) {
 
         if (section == null) {
@@ -62,7 +82,7 @@ class PinsValidator {
         section.put(subSectionName, uniquePins);
     }
 
-    private static List<Map<String, Object>> uniquePinsInArraySection(
+    private List<Map<String, Object>> uniquePinsInArraySection(
             List<Map<String, Object>> arraySection, String boxName) {
 
         if (arraySection == null) {

@@ -30,7 +30,7 @@ import com.exactpro.th2.validator.model.link.MessageLink;
 
 class GrpcLinkValidator extends BoxesLinkValidator {
 
-    public GrpcLinkValidator(SchemaContext schemaContext) {
+    GrpcLinkValidator(SchemaContext schemaContext) {
         super(schemaContext);
     }
 
