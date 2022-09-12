@@ -17,21 +17,18 @@
 package com.exactpro.th2.validator;
 
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
-import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
+import com.exactpro.th2.validator.boxes.BoxesValidator;
+import com.exactpro.th2.validator.links.LinksValidator;
 import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.validator.model.pin.*;
-import com.exactpro.th2.validator.util.SecretsUtils;
 import com.exactpro.th2.validator.util.SourceHashUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fabric8.kubernetes.api.model.Secret;
+
 import java.util.*;
 
-import static com.exactpro.th2.validator.UrlPathConflicts.detectUrlPathsConflicts;
-import static com.exactpro.th2.validator.enums.ValidationStatus.VALID;
+import static com.exactpro.th2.validator.links.enums.ValidationStatus.VALID;
 import static com.exactpro.th2.validator.util.ResourceUtils.*;
-import static com.exactpro.th2.validator.util.SecretsUtils.extractCustomConfig;
-import static com.exactpro.th2.validator.util.SecretsUtils.generateSecretsConfig;
 
 @SuppressWarnings("unchecked")
 public class SchemaValidator {
@@ -44,62 +41,27 @@ public class SchemaValidator {
         var schemaValidationContext = new SchemaValidationContext();
         try {
             Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
-            Collection<RepositoryResource> boxes = boxesMap.values();
+            String namespace = namespacePrefix + schemaName;
 
-            detectUrlPathsConflicts(schemaValidationContext, boxesMap);
-            var pinsValidator = new PinsValidator(boxes, schemaValidationContext);
-            pinsValidator.removeDuplicatePins();
-            var linksValidator = new LinksValidator(schemaValidationContext);
-            linksValidator.validateLinks(schemaName, repositoryMap);
-            validateSecrets(schemaName, namespacePrefix, schemaValidationContext, boxes);
+            var boxesValidator = new BoxesValidator(schemaValidationContext, boxesMap);
+            boxesValidator.detectUrlPathsConflicts();
+            boxesValidator.validateSecrets(namespace);
+
+            var linksValidator = new LinksValidator(schemaValidationContext, repositoryMap);
+            linksValidator.removeDuplicatePins();
+            linksValidator.validateLinks(schemaName);
+
         } catch (Exception e) {
             schemaValidationContext.addExceptionMessage(e.getMessage());
-            return schemaValidationContext;
         }
         return schemaValidationContext;
-    }
-
-    private static void validateSecrets(String schemaName,
-                                        String namespacePrefix,
-                                        SchemaValidationContext schemaValidationContext,
-                                        Collection<RepositoryResource> allBoxes) {
-        String namespace = namespacePrefix + schemaName;
-        if (SecretsUtils.namespaceNotPresent(namespace)) {
-            return;
-        }
-        Secret secret = SecretsUtils.getCustomSecret(namespace);
-        if (secret == null) {
-            String errorMessage = String.format("Secret \"secret-custom-config\" is not present in namespace: \"%s\"",
-                    namespace);
-            schemaValidationContext.addExceptionMessage(errorMessage);
-            return;
-        }
-        Map<String, String> secretData = secret.getData();
-        for (var res : allBoxes) {
-            Map<String, Object> customConfig = extractCustomConfig(res);
-            Set<String> secretsConfig = generateSecretsConfig(customConfig);
-            if (!secretsConfig.isEmpty()) {
-                for (String secretKey : secretsConfig) {
-                    if (secretData == null || !secretData.containsKey(secretKey)) {
-                        String resName = res.getMetadata().getName();
-                        String errorMessage = String.format("Value \"%s\" from " +
-                                "\"secret-custom-config\" is not present in Kubernetes", secretKey);
-                        schemaValidationContext.setInvalidResource(resName);
-                        schemaValidationContext.addBoxResourceErrorMessages(new BoxResourceErrorMessage(
-                                resName,
-                                errorMessage
-                        ));
-                    }
-                }
-            }
-        }
     }
 
     private static void setValidLinkToSections(
             List<Map<String, Object>> pins, Map<String, List<LinkToEndpoint>> validLinkToMapping) {
 
         for (var pin : pins) {
-            String pinName = (String) pin.get("name");
+            var pinName = (String) pin.get("name");
             if (validLinkToMapping.containsKey(pinName)) {
                 pin.put("linkTo", validLinkToMapping.get(pinName));
             }

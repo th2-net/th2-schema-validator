@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SchemaValidationContext {
+public final class SchemaValidationContext {
 
     private boolean valid = true;
 

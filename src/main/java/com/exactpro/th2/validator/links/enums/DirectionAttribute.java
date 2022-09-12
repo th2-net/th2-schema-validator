@@ -14,29 +14,9 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.errormessages;
+package com.exactpro.th2.validator.links.enums;
 
-public class BoxResourceErrorMessage implements PrintableMessage {
-
-    private final String box;
-
-    private final String message;
-
-    public BoxResourceErrorMessage(String box, String message) {
-        this.box = box;
-        this.message = message;
-    }
-
-    public String getBox() {
-        return box;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toPrintableMessage() {
-        return String.format("Resource: \"%s\" is invalid. %s", box, message);
-    }
+public enum DirectionAttribute {
+    publish,
+    subscribe,
 }
