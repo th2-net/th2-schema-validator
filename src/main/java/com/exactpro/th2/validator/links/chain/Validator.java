@@ -14,29 +14,13 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.errormessages;
+package com.exactpro.th2.validator.links.chain;
 
-public class BoxResourceErrorMessage implements PrintableMessage {
+public interface Validator<T, R, AD> {
 
-    private final String box;
+    @SuppressWarnings("unchecked")
+    R validate(T object, AD... additional);
 
-    private final String message;
+    void setNext(Validator<T, R, AD> validator);
 
-    public BoxResourceErrorMessage(String box, String message) {
-        this.box = box;
-        this.message = message;
-    }
-
-    public String getBox() {
-        return box;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public String toPrintableMessage() {
-        return String.format("Resource: \"%s\" is invalid. %s", box, message);
-    }
 }

@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.errormessages;
+package com.exactpro.th2.validator.links.chain;
 
-public class BoxResourceErrorMessage implements PrintableMessage {
+import com.exactpro.th2.validator.links.ValidationResult;
 
-    private final String box;
+import java.util.Objects;
 
-    private final String message;
+public abstract class AbstractValidator implements Validator<Object, ValidationResult, Object> {
 
-    public BoxResourceErrorMessage(String box, String message) {
-        this.box = box;
-        this.message = message;
-    }
+    private Validator<Object, ValidationResult, Object> next;
 
-    public String getBox() {
-        return box;
-    }
-
-    public String getMessage() {
-        return message;
+    @Override
+    public ValidationResult validate(Object object, Object... additional) {
+        if (Objects.nonNull(next)) {
+            return next.validate(object);
+        }
+        return ValidationResult.valid();
     }
 
     @Override
-    public String toPrintableMessage() {
-        return String.format("Resource: \"%s\" is invalid. %s", box, message);
+    public void setNext(Validator<Object, ValidationResult, Object> validator) {
+        this.next = validator;
     }
+
 }

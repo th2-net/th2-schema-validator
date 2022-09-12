@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-package com.exactpro.th2.validator.errormessages;
+package com.exactpro.th2.validator.links.chain.impl;
 
-public class BoxResourceErrorMessage implements PrintableMessage {
+import com.exactpro.th2.validator.links.chain.AbstractValidator;
+import com.exactpro.th2.validator.links.ValidationResult;
 
-    private final String box;
-
-    private final String message;
-
-    public BoxResourceErrorMessage(String box, String message) {
-        this.box = box;
-        this.message = message;
-    }
-
-    public String getBox() {
-        return box;
-    }
-
-    public String getMessage() {
-        return message;
-    }
+public class ResourceExists extends AbstractValidator {
 
     @Override
-    public String toPrintableMessage() {
-        return String.format("Resource: \"%s\" is invalid. %s", box, message);
+    public ValidationResult validate(Object object, Object... additional) {
+
+        if (object != null) {
+            return super.validate(object, additional);
+        }
+        return ValidationResult.invalid("Resource doesn't exist");
     }
+
 }

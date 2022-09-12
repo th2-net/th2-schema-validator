@@ -17,8 +17,8 @@
 package com.exactpro.th2.validator.model;
 
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
-import com.exactpro.th2.validator.enums.BoxDirection;
-import com.exactpro.th2.validator.enums.SchemaConnectionType;
+import com.exactpro.th2.validator.links.enums.BoxDirection;
+import com.exactpro.th2.validator.links.enums.SchemaConnectionType;
 
 public final class BoxLinkContext {
 

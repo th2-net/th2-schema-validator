@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ValidationReport {
+public final class ValidationReport {
 
-    private Map<String, List<LinkErrorMessage>> linkErrorMessages = new HashMap<>();
+    private final Map<String, List<LinkErrorMessage>> linkErrorMessages = new HashMap<>();
 
-    private List<BoxResourceErrorMessage> boxResourceErrorMessages = new ArrayList<>();
+    private final List<BoxResourceErrorMessage> boxResourceErrorMessages = new ArrayList<>();
 
-    private List<String> exceptionMessages = new ArrayList<>();
+    private final List<String> exceptionMessages = new ArrayList<>();
 
     public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {
         this.linkErrorMessages.computeIfAbsent(linkResName, k -> new ArrayList<>()).add(linkErrorMessage);

@@ -16,7 +16,7 @@
 
 package com.exactpro.th2.validator;
 
-import com.exactpro.th2.validator.enums.ValidationStatus;
+import com.exactpro.th2.validator.links.enums.ValidationStatus;
 import com.exactpro.th2.validator.model.link.MessageLink;
 
 import java.util.ArrayList;
