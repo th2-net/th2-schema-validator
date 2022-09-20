@@ -55,7 +55,7 @@ class DictionaryLinkValidator {
                 if (!schemaContext.dictionaryExists(dictionaryName)) {
                     var link = new DictionaryLink(boxName, dictionaryName);
                     schemaValidationContext.setInvalidResource(boxName);
-                    schemaValidationContext.addLinkErrorMessage(boxName, link.errorMessage(
+                    schemaValidationContext.addLinkErrorMessage(link.errorMessage(
                             String.format("Dictionary '%s' doesn't exist", dictionaryName)));
                 }
             }

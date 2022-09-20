@@ -96,26 +96,20 @@ class BoxLinkValidationTests {
         assertEquals(INVALID, validationContext.getResource(ACT).getStatus());
         assertEquals(INVALID, validationContext.getResource(RPT).getStatus());
 
-        Map<String, List<LinkErrorMessage>> errors = validationContext.getReport().getLinkErrorMessages();
-        Set<String> actualInvalidActLinks = collectLinkContents(ACT, errors);
-        Set<String> expectedInvalidActLinks = Set.of(
+        List<LinkErrorMessage> errors = validationContext.getReport().getLinkErrorMessages();
+        Set<String> actualInvalidLinks = collectLinkContents(errors);
+        Set<String> expectedInvalidLinks = Set.of(
                 linkContent(CODEC, "out_codec_decode", ACT, "from_codec"),
                 linkContent(ACT, "to_check1", "fake", "to_act"),
                 linkContent(ACT, "to_check1", ACT, "to_check1"),
-                linkContent(ACT, "to_check1", CHECK1, "client")
-        );
-
-        assertEquals(expectedInvalidActLinks, actualInvalidActLinks);
-
-        Set<String> actualInvalidRptLinks = collectLinkContents(RPT, errors);
-        Set<String> expectedInvalidRptLinks = Set.of(
+                linkContent(ACT, "to_check1", CHECK1, "client"),
                 linkContent("fake", "fake_pin", RPT, "from_codec"),
                 linkContent(CODEC, "out_codec_general_decode", RPT, "from_codec"),
                 linkContent(CODEC, "in_codec_encode", RPT, "from_codec"),
                 linkContent(RPT, "not_exist", RPT, "from_codec")
         );
 
-        assertEquals(expectedInvalidRptLinks, actualInvalidRptLinks);
+        assertEquals(expectedInvalidLinks, actualInvalidLinks);
     }
 
     @Test
@@ -161,8 +155,8 @@ class BoxLinkValidationTests {
         assertDoesNotThrow(() -> SchemaValidator.removeInvalidLinks(validationContext, boxMap.values()));
     }
 
-    private Set<String> collectLinkContents(String resName, Map<String, List<LinkErrorMessage>> errors) {
-        return errors.get(resName).stream()
+    private Set<String> collectLinkContents(List<LinkErrorMessage> errors) {
+        return errors.stream()
                 .map(LinkErrorMessage::getLinkContent)
                 .collect(Collectors.toUnmodifiableSet());
     }

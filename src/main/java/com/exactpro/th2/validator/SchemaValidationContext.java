@@ -65,8 +65,8 @@ public final class SchemaValidationContext {
         this.resources.computeIfAbsent(resourceName, k -> new ResourceValidationContext()).addValidGrpcLink(link);
     }
 
-    public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {
-        report.addLinkErrorMessage(linkResName, linkErrorMessage);
+    public void addLinkErrorMessage(LinkErrorMessage linkErrorMessage) {
+        report.addLinkErrorMessage(linkErrorMessage);
     }
 
     public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMessage) {
