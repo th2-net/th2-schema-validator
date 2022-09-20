@@ -101,14 +101,14 @@ class DictionaryLinkValidatorTests {
         assertTrue(schemaValidationContext.getResource("box1").isInvalid());
         assertTrue(schemaValidationContext.getResource("box1").isInvalid());
 
-        Map<String, List<LinkErrorMessage>> errors = schemaValidationContext.getReport().getLinkErrorMessages();
-        List<LinkErrorMessage> box1Errors = errors.get("box1");
+        List<LinkErrorMessage> errors = schemaValidationContext.getReport().getLinkErrorMessages();
+        List<LinkErrorMessage> box1Errors = getErrorsOf("box1", errors);
 
         assertNotNull(box1Errors);
         assertEquals(1, box1Errors.size());
         assertEquals(new DictionaryLink("box1", "null").getContent(), box1Errors.get(0).getLinkContent());
 
-        List<LinkErrorMessage> box2Errors = errors.get("box2");
+        List<LinkErrorMessage> box2Errors = getErrorsOf("box2", errors);
 
         assertEquals(new DictionaryLink("box2", "d9").getContent(), box2Errors.get(0).getLinkContent());
     }
@@ -134,8 +134,8 @@ class DictionaryLinkValidatorTests {
 
         var validator = new DictionaryLinkValidator(schemaContext);
         validator.validateLinks();
-        Map<String, List<LinkErrorMessage>> errors = schemaValidationContext.getReport().getLinkErrorMessages();
-        List<LinkErrorMessage> box1Errors = errors.get("box1");
+        List<LinkErrorMessage> errors = schemaValidationContext.getReport().getLinkErrorMessages();
+        List<LinkErrorMessage> box1Errors = getErrorsOf("box1", errors);
 
         assertNotNull(box1Errors);
 
@@ -146,6 +146,12 @@ class DictionaryLinkValidatorTests {
         assertEquals(2, box1ErrorsContents.size());
         assertTrue(box1ErrorsContents.contains(new DictionaryLink("box1", "invalid1").getContent()));
         assertTrue(box1ErrorsContents.contains(new DictionaryLink("box1", "invalid2").getContent()));
+    }
+
+    private List<LinkErrorMessage> getErrorsOf(String boxName, List<LinkErrorMessage> errors) {
+        return errors.stream()
+                .filter(e -> e.getLinkContent().contains(boxName))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Test

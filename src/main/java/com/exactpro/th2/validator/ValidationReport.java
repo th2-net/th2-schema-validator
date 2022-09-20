@@ -19,28 +19,25 @@ package com.exactpro.th2.validator;
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import com.exactpro.th2.validator.errormessages.LinkErrorMessage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class ValidationReport {
 
-    private final Map<String, List<LinkErrorMessage>> linkErrorMessages = new HashMap<>();
+    private final List<LinkErrorMessage> linkErrorMessages = new ArrayList<>();
 
     private final List<BoxResourceErrorMessage> boxResourceErrorMessages = new ArrayList<>();
 
     private final List<String> exceptionMessages = new ArrayList<>();
 
-    public <T extends LinkErrorMessage> void addLinkErrorMessage(String linkResName, T linkErrorMessage) {
-        this.linkErrorMessages.computeIfAbsent(linkResName, k -> new ArrayList<>()).add(linkErrorMessage);
+    public void addLinkErrorMessage(LinkErrorMessage linkErrorMsg) {
+        this.linkErrorMessages.add(linkErrorMsg);
     }
 
-    public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMessage) {
-        this.boxResourceErrorMessages.add(boxResourceErrorMessage);
+    public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMsg) {
+        this.boxResourceErrorMessages.add(boxResourceErrorMsg);
     }
 
-    public Map<String, List<LinkErrorMessage>> getLinkErrorMessages() {
+    public List<LinkErrorMessage> getLinkErrorMessages() {
         return linkErrorMessages;
     }
 

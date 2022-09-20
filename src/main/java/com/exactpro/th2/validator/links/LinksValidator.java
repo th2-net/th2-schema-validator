@@ -148,7 +148,7 @@ public final class LinksValidator {
         for (var link : links) {
             boolean sameContent = !linkContents.add(link.getContent());
             if (sameContent) {
-                validationContext.addLinkErrorMessage(link.getResourceName(), link.errorMessage(
+                validationContext.addLinkErrorMessage(link.errorMessage(
                         "Link is the same as other link(s). Ignoring"));
             } else {
                 distinctLinks.add(link);
@@ -169,7 +169,7 @@ public final class LinksValidator {
         List<MessageLink> validLinks = new ArrayList<>();
         for (var link : links) {
             if (link.getTo().getBox().equals(link.getFromBox())) {
-                validationContext.addLinkErrorMessage(link.getResourceName(), link.errorMessage(
+                validationContext.addLinkErrorMessage(link.errorMessage(
                         "\"from\" box name cannot be the same as \"to\" box name. Ignoring"));
             } else {
                 validLinks.add(link);

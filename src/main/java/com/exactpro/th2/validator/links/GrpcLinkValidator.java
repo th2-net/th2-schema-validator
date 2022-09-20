@@ -65,7 +65,7 @@ class GrpcLinkValidator extends BoxesLinkValidator {
         } catch (Exception e) {
             var schemaValidationContext = schemaContext.getSchemaValidationContext();
             schemaValidationContext.setInvalidResource(resName);
-            schemaValidationContext.addLinkErrorMessage(resName,
+            schemaValidationContext.addLinkErrorMessage(
                     new LinkErrorMessage(
                             link.getContent(),
                             String.format("Exception: %s", e.getMessage())
