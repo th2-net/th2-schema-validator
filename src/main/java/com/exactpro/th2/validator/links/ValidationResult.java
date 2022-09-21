@@ -18,6 +18,8 @@ package com.exactpro.th2.validator.links;
 
 import com.exactpro.th2.validator.links.enums.ValidationStatus;
 
+import static com.exactpro.th2.validator.links.enums.ValidationStatus.INVALID;
+
 public class ValidationResult {
 
     private final String message;
@@ -25,7 +27,7 @@ public class ValidationResult {
     private final ValidationStatus validationStatus;
 
     public static ValidationResult invalid(String message) {
-        return new ValidationResult(message, ValidationStatus.INVALID);
+        return new ValidationResult(message, INVALID);
     }
 
     public static ValidationResult valid() {
@@ -43,6 +45,10 @@ public class ValidationResult {
 
     public ValidationStatus getValidationStatus() {
         return validationStatus;
+    }
+
+    public boolean isInvalid() {
+        return getValidationStatus() == INVALID;
     }
 
 }
