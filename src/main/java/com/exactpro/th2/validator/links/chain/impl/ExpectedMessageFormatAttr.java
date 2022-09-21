@@ -19,10 +19,11 @@ package com.exactpro.th2.validator.links.chain.impl;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.validator.links.chain.AbstractValidator;
 import com.exactpro.th2.validator.links.ValidationResult;
-import com.exactpro.th2.validator.links.enums.ValidationStatus;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.pin.MqPin;
 import com.exactpro.th2.validator.model.Th2Spec;
+import com.exactpro.th2.validator.model.pin.MqPublisherPin;
+import com.exactpro.th2.validator.model.pin.MqSubscriberPin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -66,47 +67,87 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
         if (!(object instanceof MqPin)) {
             throw new IllegalStateException("Expected target of type PinSpec");
         }
-        var pin = (MqPin) object;
-        String pinName = pin.getName();
-        List<String> attributesFilteredList = pin.getAttributes()
-                .stream()
-                .filter(attribute -> attribute.startsWith(mainAttributePrefix))
-                .collect(Collectors.toList());
 
-        if (attributesFilteredList.isEmpty()) {
-            // attribute no present, no need for further checks
+        if (object instanceof MqPublisherPin) {
+            return super.validate(object, additional);
+        }
+
+        var pin = (MqSubscriberPin) object;
+
+        List<String> filteredAttributes = mainPrefixAttributes(pin);
+
+        if (filteredAttributes.isEmpty()) {
             return super.validate(pin, additional);
         }
 
-        if (attributesFilteredList.size() > 1) {
-            // error. more then 1 attribute with the same prefix.
+        ValidationResult resultForSubPin = checkForPinAttributes(pin, filteredAttributes, additional);
+        if (resultForSubPin.isInvalid()) {
+            return resultForSubPin;
+        }
+
+        if (linkedResource == null) {
+            return ValidationResult.invalid(format("Linked resource: [%s] does not exist", linkedResourceName));
+        }
+
+        String exactAttribute = filteredAttributes.get(0);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Th2Spec linkedResSpec = mapper.convertValue(linkedResource.getSpec(), Th2Spec.class);
+        MqPin linkedPin = linkedResSpec.getMqPin(linkedPinName);
+
+        List<String> attributesForLinkedPin = mainPrefixAttributes(linkedPin);
+
+        if (filteredAttributes.isEmpty()) {
+            return super.validate(pin, additional);
+        }
+
+        ValidationResult linkedPinMainAttributes = checkForPinAttributes(linkedPin, attributesForLinkedPin, additional);
+        if (linkedPinMainAttributes.isInvalid()) {
+            return linkedPinMainAttributes;
+        }
+
+        ValidationResult linkedPinOtherAttributeMatch = linkedPinAttributeMatch(
+                linkedPin, exactAttribute, otherMatchingAttributePrefixes
+        );
+        if (linkedPinOtherAttributeMatch.isInvalid()) {
+            return linkedPinOtherAttributeMatch;
+        }
+        return super.validate(pin, additional);
+    }
+
+    private ValidationResult checkForPinAttributes(MqPin pin, List<String> filteredAttributes, Object... additional) {
+        ValidationResult duplicationResult = checkForDuplication(pin, filteredAttributes, additional);
+        if (duplicationResult.isInvalid()) {
+            return duplicationResult;
+        }
+
+        var contradictingAttributesResult = checkContradictingAttributes(pin, contradictingAttributePrefixes);
+        if (contradictingAttributesResult.isInvalid()) {
+            return contradictingAttributesResult;
+        }
+
+        return ValidationResult.valid();
+    }
+
+    private ValidationResult checkForDuplication(MqPin pin, List<String> filteredAttributes, Object... additional) {
+        String pinName = pin.getName();
+
+        if (filteredAttributes.size() > 1) {
+            // error. more than 1 attribute with the same prefix.
             return ValidationResult.invalid(
                     format("Invalid pin: \"%s\". detected multiple attributes with prefix: [%s]",
                             pinName, mainAttributePrefix)
             );
         }
 
-        String exactAttribute = attributesFilteredList.get(0);
+        return ValidationResult.valid();
+    }
 
-        //check that there are no contradicting attributes on the same pin.
-        var contradictingAttributesResult = checkContradictingAttributes(pin, contradictingAttributePrefixes);
-        if (!contradictingAttributesResult.getValidationStatus().equals(ValidationStatus.VALID)) {
-            // contradicting attribute has been detected.
-            return contradictingAttributesResult;
-        }
-
-        if (linkedResource == null) {
-            return ValidationResult.invalid(format("Linked resource: [%s] does not exist", linkedResourceName));
-        }
-        //step 2: check if linked pin contains matching attributes
-        ObjectMapper mapper = new ObjectMapper();
-        Th2Spec linkedResSpec = mapper.convertValue(linkedResource.getSpec(), Th2Spec.class);
-        MqPin linkedPin = linkedResSpec.getMqPin(linkedPinName);
-        var oppositePinResult = oppositePinAttributeMatch(linkedPin, exactAttribute, otherMatchingAttributePrefixes);
-        if (!oppositePinResult.getValidationStatus().equals(ValidationStatus.VALID)) {
-            return oppositePinResult;
-        }
-        return super.validate(pin, additional);
+    private List<String> mainPrefixAttributes(MqPin pin) {
+        return pin.getAttributes()
+                .stream()
+                .filter(attribute -> attribute.startsWith(mainAttributePrefix))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     protected ValidationResult checkContradictingAttributes(MqPin pin, List<String> excludedAttributePrefixes) {
@@ -116,16 +157,16 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
                     .filter(attribute -> attribute.startsWith(excludedPrefix)).collect(Collectors.toList());
             if (contradictingAttributes.size() > 0) {
                 return ValidationResult.invalid(format("Invalid pin: \"%s\". [%s] are contradicting with: [%s]",
-                        pin.getName(), contradictingAttributes.toString(), mainAttributePrefix)
+                        pin.getName(), contradictingAttributes, mainAttributePrefix)
                 );
             }
         }
         return ValidationResult.valid();
     }
 
-    protected ValidationResult oppositePinAttributeMatch(MqPin linkedPin,
-                                                         String exactAttribute,
-                                                         List<String> otherMatchingAttributePrefixes) {
+    protected ValidationResult linkedPinAttributeMatch(MqPin linkedPin,
+                                                       String exactAttribute,
+                                                       List<String> otherMatchingAttributePrefixes) {
         if (linkedPin == null) {
             return ValidationResult.invalid(format("Linked pin: [%s] on resource: [%s] does not exist",
                     linkedPinName, linkedResourceName));
