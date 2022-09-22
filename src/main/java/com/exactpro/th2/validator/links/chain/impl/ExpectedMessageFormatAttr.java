@@ -156,7 +156,7 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
                     .stream()
                     .filter(attribute -> attribute.startsWith(excludedPrefix)).collect(Collectors.toList());
             if (contradictingAttributes.size() > 0) {
-                return ValidationResult.invalid(format("Invalid pin: \"%s\". [%s] are contradicting with: [%s]",
+                return ValidationResult.invalid(format("Invalid pin: \"%s\". [%s] contradicts with: [%s]",
                         pin.getName(), contradictingAttributes, mainAttributePrefix)
                 );
             }

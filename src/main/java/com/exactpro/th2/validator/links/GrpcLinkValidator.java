@@ -83,7 +83,7 @@ class GrpcLinkValidator extends BoxesLinkValidator {
     @Override
     ValidationResult validateByContext(RepositoryResource resource,
                                        BoxLinkContext context) {
-        var resValidator = new ResourceExists();
+        var resValidator = new ResourceExists(context);
         var pinExist = new PinExist(context);
         var expectedServiceClass = new ExpectedServiceClass(context);
 
