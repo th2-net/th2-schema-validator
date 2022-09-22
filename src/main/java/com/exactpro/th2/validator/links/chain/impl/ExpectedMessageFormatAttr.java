@@ -68,11 +68,11 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
             throw new IllegalStateException("Expected target of type PinSpec");
         }
 
-        if (object instanceof MqPublisherPin) {
+        if (object instanceof MqSubscriberPin) {
             return super.validate(object, additional);
         }
 
-        var pin = (MqSubscriberPin) object;
+        var pin = (MqPublisherPin) object;
 
         List<String> filteredAttributes = mainPrefixAttributes(pin);
 
