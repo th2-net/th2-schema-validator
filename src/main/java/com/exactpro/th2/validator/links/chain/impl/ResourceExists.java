@@ -18,8 +18,15 @@ package com.exactpro.th2.validator.links.chain.impl;
 
 import com.exactpro.th2.validator.links.chain.AbstractValidator;
 import com.exactpro.th2.validator.links.ValidationResult;
+import com.exactpro.th2.validator.model.BoxLinkContext;
 
 public class ResourceExists extends AbstractValidator {
+
+    private final String resourceName;
+
+    public ResourceExists(BoxLinkContext context) {
+        this.resourceName = context.getBoxName();
+    }
 
     @Override
     public ValidationResult validate(Object object, Object... additional) {
@@ -27,7 +34,7 @@ public class ResourceExists extends AbstractValidator {
         if (object != null) {
             return super.validate(object, additional);
         }
-        return ValidationResult.invalid("Resource doesn't exist");
+        return ValidationResult.invalid(String.format("Resource [%s] doesn't exist", resourceName));
     }
 
 }

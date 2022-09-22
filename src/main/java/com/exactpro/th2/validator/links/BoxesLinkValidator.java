@@ -56,15 +56,13 @@ abstract class BoxesLinkValidator {
         String toBoxName = link.getToBox();
         //check if "from" resource is valid
         if (!fromResValidationResult.getValidationStatus().equals(VALID)) {
-            String message = format("\"%s\" %s. link will be ignored.",
-                    fromBoxName, fromResValidationResult.getMessage());
+            String message = format("%s. link will be ignored.", fromResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
             schemaValidationContext.setInvalidResource(resName);
             schemaValidationContext.addLinkErrorMessage(link.errorMessage(message));
         }
         if (!toResValidationResult.getValidationStatus().equals(VALID)) {
-            String message = format("\"%s\" %s. link will be ignored.",
-                    toBoxName, toResValidationResult.getMessage());
+            String message = format("%s. link will be ignored.", toResValidationResult.getMessage());
             //Mark "th2link" resource as invalid, since it contains invalid link
             schemaValidationContext.setInvalidResource(resName);
             schemaValidationContext.addLinkErrorMessage(link.errorMessage(message));

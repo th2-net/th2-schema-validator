@@ -87,7 +87,7 @@ class MqLinkValidator extends BoxesLinkValidator {
     @Override
     ValidationResult validateByContext(RepositoryResource resource,
                                        BoxLinkContext context) {
-        var resValidator = new ResourceExists();
+        var resValidator = new ResourceExists(context);
         var pinExist = new PinExist(context);
         var expectedPinAttr = new ExpectedDirectionalAttr(context);
         var expectedRawAttr = new ExpectedRawMessageAttr(context);
