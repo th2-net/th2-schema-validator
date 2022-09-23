@@ -97,13 +97,11 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
 
         List<String> attributesForLinkedPin = mainPrefixAttributes(linkedPin);
 
-        if (filteredAttributes.isEmpty()) {
-            return super.validate(pin, additional);
-        }
-
-        ValidationResult linkedPinMainAttributes = checkForPinAttributes(linkedPin, attributesForLinkedPin, additional);
-        if (linkedPinMainAttributes.isInvalid()) {
-            return linkedPinMainAttributes;
+        if (!attributesForLinkedPin.isEmpty()) {
+            var linkedPinMainAttributes = checkForPinAttributes(linkedPin, attributesForLinkedPin, additional);
+            if (linkedPinMainAttributes.isInvalid()) {
+                return linkedPinMainAttributes;
+            }
         }
 
         ValidationResult linkedPinOtherAttributeMatch = linkedPinAttributeMatch(
