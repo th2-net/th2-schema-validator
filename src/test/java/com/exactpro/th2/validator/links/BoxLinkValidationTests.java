@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.exactpro.th2.validator.links.enums.ValidationStatus.INVALID;
 import static com.exactpro.th2.validator.util.ResourceUtils.collectAllBoxes;
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoxLinkValidationTests {
@@ -41,7 +42,7 @@ class BoxLinkValidationTests {
 
     private static final String SCHEMA = "schema";
 
-    private static final String PATH = "src/test/resources/linkstest/";
+    private static final String PATH = "src/test/resources/linksTest/";
 
     private static final String EXTENSION = ".yml";
 
@@ -143,16 +144,27 @@ class BoxLinkValidationTests {
 
     @Test
     void testSpecNullSafety() throws IOException {
-        final var noSpecBoxFile = new File("src/test/resources/NoSpecBox.yml");
+        final var noSpecBoxName = "NoSpecBox";
+        final var nullLinkToSectionBoxName = "NullLinkToSectionBox";
+        final var noSpecBoxFile = new File(
+                format("src/test/resources/%s.yml", noSpecBoxName));
+        final var nullLinkToFile = new File(
+                format("src/test/resources/linksTest/%s.yml", nullLinkToSectionBoxName));
         var noSpecBox = mapper.readValue(noSpecBoxFile, RepositoryResource.class);
+        var nullLinkToBox = mapper.readValue(nullLinkToFile, RepositoryResource.class);
+
         Map<String, Map<String, RepositoryResource>> repoMap = Map.of(
-                ResourceType.Th2Box.kind(), Map.of("NoSpecBox", noSpecBox)
+                ResourceType.Th2Box.kind(),
+                Map.of(noSpecBoxName, noSpecBox,
+                        nullLinkToSectionBoxName, nullLinkToBox)
         );
         Map<String, RepositoryResource> boxMap = collectAllBoxes(repoMap);
         var validationContext = new SchemaValidationContext();
         var validator = new LinksValidator(validationContext, repoMap);
         assertDoesNotThrow(() -> validator.validateLinks(SCHEMA));
         assertDoesNotThrow(() -> SchemaValidator.removeInvalidLinks(validationContext, boxMap.values()));
+
+        assertEquals(Set.of(noSpecBoxName), validationContext.getInvalidResources());
     }
 
     private Set<String> collectLinkContents(List<LinkErrorMessage> errors) {
@@ -162,7 +174,7 @@ class BoxLinkValidationTests {
     }
 
     private String linkContent(String fromBox, String fromPin, String toBox, String toPin) {
-        return String.format("FROM %s:%s TO %s:%s",
+        return format("FROM %s:%s TO %s:%s",
                 fromBox, fromPin,
                 toBox, toPin);
     }

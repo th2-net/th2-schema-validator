@@ -1,0 +1,10 @@
+apiVersion: th2.exactpro.com/v2
+kind: Th2Box
+metadata:
+  name: NullLinkToSectionBox
+spec:
+  pins:
+    mq:
+      subscribers:
+        - name: sub_pin
+          linkTo:
