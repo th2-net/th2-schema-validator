@@ -34,6 +34,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 
 import static com.exactpro.th2.validator.util.ResourceUtils.collectAllBoxes;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNullElse;
 
 public final class LinksValidator {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -99,15 +101,12 @@ public final class LinksValidator {
             final String boxName = box.getMetadata().getName();
             try {
                 Th2Spec boxSpec = mapper.convertValue(box.getSpec(), Th2Spec.class);
-                if (boxSpec == null) {
-                    continue;
-                }
 
-                List<MqSubscriberPin> subscribers = Objects.requireNonNullElse(
-                        boxSpec.getMqSubscribers(), Collections.emptyList()
+                List<MqSubscriberPin> subscribers = requireNonNullElse(
+                        boxSpec.getMqSubscribers(), emptyList()
                 );
                 for (var sub : subscribers) {
-                    List<LinkToEndpoint> linkTo = sub.getLinkTo();
+                    List<LinkToEndpoint> linkTo = requireNonNullElse(sub.getLinkTo(), emptyList());
                     String pinName = sub.getName();
                     linkTo.forEach(startPoint -> boxesRelation.addToMq(new MessageLink(
                             startPoint.mqLinkMetaData(boxName, pinName),
@@ -116,10 +115,11 @@ public final class LinksValidator {
                     )));
                 }
 
-                List<GrpcClientPin> clients = Objects.requireNonNullElse(
-                        boxSpec.getGrpcClientPins(), Collections.emptyList());
+                List<GrpcClientPin> clients = requireNonNullElse(
+                        boxSpec.getGrpcClientPins(), emptyList()
+                );
                 for (var client : clients) {
-                    List<LinkToEndpoint> linkTo = client.getLinkTo();
+                    List<LinkToEndpoint> linkTo = requireNonNullElse(client.getLinkTo(), emptyList());
                     String pinName = client.getName();
                     linkTo.forEach(destination -> boxesRelation.addToGrpc(new MessageLink(
                             destination.grpcLinkMetaData(boxName, pinName),

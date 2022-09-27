@@ -1,4 +1,4 @@
 apiVersion: th2.exactpro.com/v2
 kind: Th2Box
 metadata:
-  name: no_spec
+  name: NoSpecBox
