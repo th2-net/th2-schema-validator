@@ -66,6 +66,7 @@ public final class SchemaValidationContext {
     }
 
     public void addLinkErrorMessage(LinkErrorMessage linkErrorMessage) {
+        this.valid = false;
         report.addLinkErrorMessage(linkErrorMessage);
     }
 
