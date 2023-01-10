@@ -174,3 +174,7 @@ jar {
 test {
     useJUnitPlatform()
 }
+
+dependencyLocking {    
+    lockAllConfigurations()
+}
