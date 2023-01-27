@@ -25,7 +25,8 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public class ResourceUtils {
-    private ResourceUtils() {}
+    private ResourceUtils() {
+    }
 
     public static Map<String, Object> getSection(Map<String, Object> parent, String sectionName) {
         return parent != null ? (Map<String, Object>) parent.get(sectionName) : null;
@@ -40,9 +41,12 @@ public class ResourceUtils {
     ) {
         String boxKind = ResourceType.Th2Box.kind();
         String coreBoxKind = ResourceType.Th2CoreBox.kind();
+        String jobKind = ResourceType.Th2Job.kind();
+        Map<String, RepositoryResource> jobs = repositoryMap.getOrDefault(jobKind, Map.of());
         Map<String, RepositoryResource> boxes = repositoryMap.getOrDefault(boxKind, Map.of());
         Map<String, RepositoryResource> coreBoxes = repositoryMap.getOrDefault(coreBoxKind, Map.of());
         Map<String, RepositoryResource> allBoxes = new HashMap<>(boxes);
+        allBoxes.putAll(jobs);
         allBoxes.putAll(coreBoxes);
         return allBoxes;
     }

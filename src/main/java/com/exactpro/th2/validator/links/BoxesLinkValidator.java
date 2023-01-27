@@ -52,8 +52,6 @@ abstract class BoxesLinkValidator {
             addValidMessageLink(resName, link);
             return;
         }
-        String fromBoxName = link.getFromBox();
-        String toBoxName = link.getToBox();
         //check if "from" resource is valid
         if (!fromResValidationResult.getValidationStatus().equals(VALID)) {
             String message = format("%s. link will be ignored.", fromResValidationResult.getMessage());
