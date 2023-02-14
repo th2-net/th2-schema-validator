@@ -9,7 +9,7 @@ plugins {
 
 ext {
     sharedDir = file("${project.rootDir}/libs")
-    infra_repo_version = '1.2.1-infra-2.0-4024738705-0c798ab-SNAPSHOT'
+    infra_repo_version = '1.2.1-infra-2.0-4142754451-c1cb4cd-SNAPSHOT'
     fabric_version = '6.3.1'
     commons_text_version = '1.10.0'
     jupiter_version = '5.9.0'
