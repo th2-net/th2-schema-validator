@@ -20,49 +20,89 @@ import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.infrarepo.settings.RepositorySettingsResource;
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 public class BookNamesValidator {
-
     private static final String BOOK_NAME = "bookName";
 
-    public static void validate(RepositorySettingsResource settings,
-                                Map<String, RepositoryResource> boxesMap,
-                                SchemaValidationContext schemaValidationContext) {
-        Set<String> checkedBooks = new HashSet<>();
-        String defaultBook = settings.getSpec().getBookConfig().getDefaultBook();
+    private final SchemaValidationContext validationContext;
+
+    private final Map<String, RepositoryResource> boxesMap;
+
+    private final RepositorySettingsResource settings;
+
+    private final String storageServiceBaseUrl;
+
+    public BookNamesValidator(RepositorySettingsResource settings,
+                              String storageServiceBaseUrl,
+                              SchemaValidationContext validationContext,
+                              Map<String, RepositoryResource> boxesMap) {
+        this.settings = settings;
+        this.validationContext = validationContext;
+        this.boxesMap = Collections.unmodifiableMap(boxesMap);
+        this.storageServiceBaseUrl = storageServiceBaseUrl;
+    }
+
+    public void validate() {
+        String keyspace = settings.getSpec().getCradle().getKeyspace();
         try {
-            if (!bookExists(defaultBook)) {
-                schemaValidationContext.addBoxResourceErrorMessages(new BoxResourceErrorMessage(
-                        settings.getMetadata().getName(),
-                        String.format("Specified Default book \"%s\" is not present in database", defaultBook)
-                ));
+            if (!keyspaceExists(keyspace)) {
+                validationContext.addExceptionMessage(
+                        String.format("Specified Keyspace \"%s\" is not present in database. " +
+                                "Can't proceed with books validation", keyspace));
+                return;
             }
+            checkBooks();
         } catch (Exception e) {
-            schemaValidationContext.addExceptionMessage(e.getMessage());
+            validationContext.addExceptionMessage(e.getMessage());
         }
-        checkedBooks.add(defaultBook);
-        for (var entry : boxesMap.entrySet()) {
-            try {
-                Map<String, Object> spec = (Map<String, Object>) entry.getValue().getSpec();
-                String bookName = (String) spec.get(BOOK_NAME);
-                if (bookName == null || checkedBooks.contains(bookName)) {
-                    continue;
-                }
-                if (!bookExists(bookName)) {
-                    schemaValidationContext.addBoxResourceErrorMessages(new BoxResourceErrorMessage(
-                            entry.getValue().getMetadata().getName(),
-                            String.format("Specified book \"%s\" is not present in database", bookName)
-                    ));
-                }
-                checkedBooks.add(bookName);
-            } catch (Exception e) {
-                schemaValidationContext.addExceptionMessage(e.getMessage());
+    }
+
+    private void checkBooks() throws IOException {
+        String keyspace = settings.getSpec().getCradle().getKeyspace();
+        for (var entry : mapResourcesAndBooks().entrySet()) {
+            String resource = entry.getKey();
+            String book = entry.getValue();
+            if (!bookExists(keyspace, book)) {
+                validationContext.addBookErrorMessages(new BoxResourceErrorMessage(
+                        resource,
+                        String.format("Specified book \"%s\" is not present in database", book)
+                ));
             }
         }
     }
 
-    private static boolean bookExists(String bookName) {
-        return false;
+    private boolean keyspaceExists(String keyspace) throws IOException {
+        String urlStr = String.format(" http://%s/api/keyspaces/%s", storageServiceBaseUrl, keyspace);
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+    }
+
+    private boolean bookExists(String keyspace, String bookName) throws IOException {
+        String urlStr = String.format(" http://%s/api/%s/books/%s", storageServiceBaseUrl, keyspace, bookName);
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+    }
+
+    private Map<String, String> mapResourcesAndBooks() {
+        Map<String, String> resourceToBook = new HashMap<>();
+        String defaultBook = settings.getSpec().getBookConfig().getDefaultBook();
+        if (defaultBook != null) {
+            resourceToBook.put(settings.getMetadata().getName(), defaultBook);
+        }
+        for (var entry : boxesMap.entrySet()) {
+            Map<String, Object> spec = (Map<String, Object>) entry.getValue().getSpec();
+            String bookName = (String) spec.get(BOOK_NAME);
+            if (bookName == null) {
+                continue;
+            }
+            resourceToBook.put(entry.getValue().getMetadata().getName(), bookName);
+        }
+        return resourceToBook;
     }
 }

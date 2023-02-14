@@ -71,7 +71,13 @@ public final class SchemaValidationContext {
     }
 
     public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMessage) {
+        this.valid = false;
         report.addBoxResourceErrorMessages(boxResourceErrorMessage);
+    }
+
+    public void addBookErrorMessages(BoxResourceErrorMessage bookErrorMessage) {
+        this.valid = false;
+        report.addBookErrorMessages(bookErrorMessage);
     }
 
     public ResourceValidationContext getResource(String resName) {

@@ -27,6 +27,8 @@ public final class ValidationReport {
 
     private final List<BoxResourceErrorMessage> boxResourceErrorMessages = new ArrayList<>();
 
+    private final List<BoxResourceErrorMessage> bookErrorMessages = new ArrayList<>();
+
     private final List<String> exceptionMessages = new ArrayList<>();
 
     public void addLinkErrorMessage(LinkErrorMessage linkErrorMsg) {
@@ -35,6 +37,14 @@ public final class ValidationReport {
 
     public void addBoxResourceErrorMessages(BoxResourceErrorMessage boxResourceErrorMsg) {
         this.boxResourceErrorMessages.add(boxResourceErrorMsg);
+    }
+
+    public void addBookErrorMessages(BoxResourceErrorMessage bookErrorMsg) {
+        this.bookErrorMessages.add(bookErrorMsg);
+    }
+
+    public List<BoxResourceErrorMessage> getBookErrorMessages() {
+        return bookErrorMessages;
     }
 
     public List<LinkErrorMessage> getLinkErrorMessages() {

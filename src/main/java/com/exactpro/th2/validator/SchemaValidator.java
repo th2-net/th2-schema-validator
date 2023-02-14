@@ -17,6 +17,7 @@
 package com.exactpro.th2.validator;
 
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
+import com.exactpro.th2.infrarepo.settings.RepositorySettingsResource;
 import com.exactpro.th2.validator.boxes.BoxesValidator;
 import com.exactpro.th2.validator.links.LinksValidator;
 import com.exactpro.th2.validator.model.link.MessageLink;
@@ -37,6 +38,8 @@ public class SchemaValidator {
 
     public static SchemaValidationContext validate(String schemaName,
                                                    String namespacePrefix,
+                                                   String storageServiceBaseUrl,
+                                                   RepositorySettingsResource settingsResource,
                                                    Map<String, Map<String, RepositoryResource>> repositoryMap) {
         var schemaValidationContext = new SchemaValidationContext();
         try {
@@ -51,6 +54,13 @@ public class SchemaValidator {
             linksValidator.removeDuplicatePins();
             linksValidator.validateLinks(schemaName);
 
+            var booksValidator = new BookNamesValidator(
+                    settingsResource,
+                    storageServiceBaseUrl,
+                    schemaValidationContext,
+                    boxesMap
+            );
+            booksValidator.validate();
         } catch (Exception e) {
             schemaValidationContext.addExceptionMessage(e.getMessage());
         }
