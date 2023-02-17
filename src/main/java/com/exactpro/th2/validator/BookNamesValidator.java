@@ -76,7 +76,7 @@ public class BookNamesValidator {
     }
 
     private boolean keyspaceExists(String keyspace) throws IOException {
-        String urlStr = String.format(" http://%s/api/keyspaces/%s", storageServiceBaseUrl, keyspace);
+        String urlStr = String.format(" http://%s/api/%s", storageServiceBaseUrl, keyspace);
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         return connection.getResponseCode() == HttpURLConnection.HTTP_OK;
