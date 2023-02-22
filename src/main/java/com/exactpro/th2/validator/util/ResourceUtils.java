@@ -16,7 +16,6 @@
 
 package com.exactpro.th2.validator.util;
 
-import com.exactpro.th2.infrarepo.ResourceType;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 
 import java.util.HashMap;
@@ -36,18 +35,14 @@ public class ResourceUtils {
         return parent != null ? (List<Map<String, Object>>) parent.get(sectionName) : null;
     }
 
-    public static Map<String, RepositoryResource> collectAllBoxes(
-            Map<String, Map<String, RepositoryResource>> repositoryMap
+    public static Map<String, RepositoryResource> collectResources(
+            Map<String, Map<String, RepositoryResource>> repositoryMap,
+            String... kinds
     ) {
-        String boxKind = ResourceType.Th2Box.kind();
-        String coreBoxKind = ResourceType.Th2CoreBox.kind();
-        String jobKind = ResourceType.Th2Job.kind();
-        Map<String, RepositoryResource> jobs = repositoryMap.getOrDefault(jobKind, Map.of());
-        Map<String, RepositoryResource> boxes = repositoryMap.getOrDefault(boxKind, Map.of());
-        Map<String, RepositoryResource> coreBoxes = repositoryMap.getOrDefault(coreBoxKind, Map.of());
-        Map<String, RepositoryResource> allBoxes = new HashMap<>(boxes);
-        allBoxes.putAll(jobs);
-        allBoxes.putAll(coreBoxes);
-        return allBoxes;
+        Map<String, RepositoryResource> result = new HashMap<>();
+        for (String kind : kinds) {
+            result.putAll(repositoryMap.getOrDefault(kind, Map.of()));
+        }
+        return result;
     }
 }
