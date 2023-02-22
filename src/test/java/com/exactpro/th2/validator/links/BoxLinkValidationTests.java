@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.exactpro.th2.validator.links.enums.ValidationStatus.INVALID;
-import static com.exactpro.th2.validator.util.ResourceUtils.collectAllBoxes;
+import static com.exactpro.th2.validator.util.ResourceUtils.collectResources;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -116,7 +116,12 @@ class BoxLinkValidationTests {
     @Test
     void testRemoveInvalidLinks() throws IOException {
         Map<String, Map<String, RepositoryResource>> repoMap = initRepositoryMap();
-        Map<String, RepositoryResource> boxMap = collectAllBoxes(repoMap);
+        Map<String, RepositoryResource> boxMap = collectResources(
+                repoMap,
+                ResourceType.Th2Box.kind(),
+                ResourceType.Th2CoreBox.kind(),
+                ResourceType.Th2Job.kind()
+        );
         var validationContext = new SchemaValidationContext();
         var validator = new LinksValidator(validationContext, repoMap);
         validator.validateLinks(SCHEMA);
@@ -158,7 +163,12 @@ class BoxLinkValidationTests {
                 Map.of(noSpecBoxName, noSpecBox,
                         nullLinkToSectionBoxName, nullLinkToBox)
         );
-        Map<String, RepositoryResource> boxMap = collectAllBoxes(repoMap);
+        Map<String, RepositoryResource> boxMap = collectResources(
+                repoMap,
+                ResourceType.Th2Box.kind(),
+                ResourceType.Th2CoreBox.kind(),
+                ResourceType.Th2Job.kind()
+        );
         var validationContext = new SchemaValidationContext();
         var validator = new LinksValidator(validationContext, repoMap);
         assertDoesNotThrow(() -> validator.validateLinks(SCHEMA));

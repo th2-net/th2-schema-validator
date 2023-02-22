@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
-import static com.exactpro.th2.validator.util.ResourceUtils.collectAllBoxes;
+import static com.exactpro.th2.validator.util.ResourceUtils.collectResources;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNullElse;
 
@@ -51,7 +51,12 @@ public final class LinksValidator {
     }
 
     public void validateLinks(String schemaName) {
-        Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
+        Map<String, RepositoryResource> boxesMap = collectResources(
+                repositoryMap,
+                ResourceType.Th2Box.kind(),
+                ResourceType.Th2CoreBox.kind(),
+                ResourceType.Th2Job.kind()
+        );
         Collection<RepositoryResource> boxes = boxesMap.values();
 
         BoxesRelation links = arrangeBoxLinks(boxes);
@@ -83,7 +88,12 @@ public final class LinksValidator {
     }
 
     public void removeDuplicatePins() {
-        Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
+        Map<String, RepositoryResource> boxesMap = collectResources(
+                repositoryMap,
+                ResourceType.Th2Box.kind(),
+                ResourceType.Th2CoreBox.kind(),
+                ResourceType.Th2Job.kind()
+        );
         var pinsValidator = new PinsValidator(validationContext, boxesMap.values());
         pinsValidator.removeDuplicatePins();
     }

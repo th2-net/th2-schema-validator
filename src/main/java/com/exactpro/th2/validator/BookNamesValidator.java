@@ -19,6 +19,8 @@ package com.exactpro.th2.validator;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.infrarepo.settings.RepositorySettingsResource;
 import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -26,6 +28,9 @@ import java.net.URL;
 import java.util.*;
 
 public class BookNamesValidator {
+
+    private static final Logger logger = LoggerFactory.getLogger(BookNamesValidator.class);
+
     private static final String BOOK_NAME = "bookName";
 
     private final SchemaValidationContext validationContext;
@@ -47,6 +52,10 @@ public class BookNamesValidator {
     }
 
     public void validate() {
+        if (checkCustomCassandra()) {
+            logger.warn("Custom configuration for Cassandra detected. Keyspace and bookName check will be ignored");
+            return;
+        }
         String keyspace = settings.getSpec().getCradle().getKeyspace();
         try {
             if (!keyspaceExists(keyspace)) {
@@ -59,6 +68,15 @@ public class BookNamesValidator {
         } catch (Exception e) {
             validationContext.addExceptionMessage(e.getMessage());
         }
+    }
+
+    private boolean checkCustomCassandra() {
+        var cradle = settings.getSpec().getCradle();
+        return cradle.isUseCustomPassword()
+                || cradle.getHost() != null
+                || cradle.getPort() != 0
+                || cradle.getUsername() != null
+                || cradle.getDataCenter() != null;
     }
 
     private void checkBooks() throws IOException {

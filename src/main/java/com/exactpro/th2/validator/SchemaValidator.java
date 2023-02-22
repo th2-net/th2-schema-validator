@@ -16,6 +16,7 @@
 
 package com.exactpro.th2.validator;
 
+import com.exactpro.th2.infrarepo.ResourceType;
 import com.exactpro.th2.infrarepo.repo.RepositoryResource;
 import com.exactpro.th2.infrarepo.settings.RepositorySettingsResource;
 import com.exactpro.th2.validator.boxes.BoxesValidator;
@@ -43,7 +44,14 @@ public class SchemaValidator {
                                                    Map<String, Map<String, RepositoryResource>> repositoryMap) {
         var schemaValidationContext = new SchemaValidationContext();
         try {
-            Map<String, RepositoryResource> boxesMap = collectAllBoxes(repositoryMap);
+            Map<String, RepositoryResource> boxesMap = collectResources(
+                    repositoryMap,
+                    ResourceType.Th2Box.kind(),
+                    ResourceType.Th2CoreBox.kind(),
+                    ResourceType.Th2Job.kind(),
+                    ResourceType.Th2Mstore.kind(),
+                    ResourceType.Th2Estore.kind()
+            );
             String namespace = namespacePrefix + schemaName;
 
             var boxesValidator = new BoxesValidator(schemaValidationContext, boxesMap);
