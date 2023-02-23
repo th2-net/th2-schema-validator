@@ -5,12 +5,13 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'signing'
     id 'checkstyle'
+    id "org.owasp.dependencycheck" version "8.1.0"
 }
 
 ext {
     sharedDir = file("${project.rootDir}/libs")
-    infra_repo_version = '1.2.1'
-    fabric_version = '6.3.1'
+    infra_repo_version = '1.2.2'
+    fabric_version = '6.4.1'
     commons_text_version = '1.10.0'
     jupiter_version = '5.9.0'
 }
@@ -137,7 +138,7 @@ clean {
 }
 
 checkstyle {
-    toolVersion = "8.26"
+    toolVersion = "10.7.0"
 }
 
 dependencies {
@@ -147,6 +148,17 @@ dependencies {
 
     testImplementation "org.junit.jupiter:junit-jupiter:${jupiter_version}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jupiter_version}"
+}
+
+dependencyCheck {
+    formats=['SARIF', 'JSON', 'HTML']
+    failBuildOnCVSS=5
+
+    analyzers {
+        assemblyEnabled = false
+        nugetconfEnabled = false
+        nodeEnabled = false
+    }
 }
 
 jar {
