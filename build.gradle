@@ -5,12 +5,12 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'signing'
     id 'checkstyle'
-    id "org.owasp.dependencycheck" version "8.1.0"
+    id "org.owasp.dependencycheck" version "${owaspVersion}"
 }
 
 ext {
     sharedDir = file("${project.rootDir}/libs")
-    infra_repo_version = '1.2.2'
+    infra_repo_version = '1.2.3'
     fabric_version = '6.4.1'
     commons_text_version = '1.10.0'
     jupiter_version = '5.9.0'
