@@ -55,7 +55,9 @@ public final class LinksValidator {
                 repositoryMap,
                 ResourceType.Th2Box.kind(),
                 ResourceType.Th2CoreBox.kind(),
-                ResourceType.Th2Job.kind()
+                ResourceType.Th2Job.kind(),
+                ResourceType.Th2Mstore.kind(),
+                ResourceType.Th2Estore.kind()
         );
         Collection<RepositoryResource> boxes = boxesMap.values();
 
@@ -92,7 +94,9 @@ public final class LinksValidator {
                 repositoryMap,
                 ResourceType.Th2Box.kind(),
                 ResourceType.Th2CoreBox.kind(),
-                ResourceType.Th2Job.kind()
+                ResourceType.Th2Job.kind(),
+                ResourceType.Th2Mstore.kind(),
+                ResourceType.Th2Estore.kind()
         );
         var pinsValidator = new PinsValidator(validationContext, boxesMap.values());
         pinsValidator.removeDuplicatePins();
