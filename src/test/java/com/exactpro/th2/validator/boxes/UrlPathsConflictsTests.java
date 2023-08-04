@@ -62,6 +62,7 @@ class UrlPathsConflictsTests {
                 .collect(Collectors.joining("\n"));
 
         /* 3 as box1->box2, box2->box3, box1->box3 all relations have URL1 conflict */
+        assertEquals(2, StringUtils.countMatches(errorMsgs, "Contains duplicated url paths"));
         assertEquals(3, StringUtils.countMatches(errorMsgs, "URL1"));
         assertEquals(1, StringUtils.countMatches(errorMsgs, "URL2"));
         assertEquals(1, StringUtils.countMatches(errorMsgs, "URL4"));

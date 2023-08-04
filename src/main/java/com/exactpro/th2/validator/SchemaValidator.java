@@ -25,17 +25,15 @@ import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.validator.model.pin.*;
 import com.exactpro.th2.validator.util.SourceHashUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
 import static com.exactpro.th2.validator.links.enums.ValidationStatus.VALID;
+import static com.exactpro.th2.validator.util.MapperUtils.MAPPER;
 import static com.exactpro.th2.validator.util.ResourceUtils.*;
 
 @SuppressWarnings("unchecked")
 public class SchemaValidator {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static SchemaValidationContext validate(String schemaName,
                                                    String namespacePrefix,
@@ -131,7 +129,7 @@ public class SchemaValidator {
                 setValidLinkToSections(clientSection, validGrpcClientsLinkTo);
             }
 
-            String specStr = mapper.writeValueAsString(spec);
+            String specStr = MAPPER.writeValueAsString(spec);
             box.setSourceHash(SourceHashUtil.digest(specStr));
         }
     }

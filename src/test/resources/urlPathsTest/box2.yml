@@ -5,11 +5,20 @@ metadata:
 spec:
   extendedSettings:
     service:
-      enabled: false
-      ingress:
-        urlPaths:
-          - URL1
-          - URL2
-          - URL2
-          - URL3
-          - URL4
+      enabled: true
+      nodePort:
+        - name: port1
+          containerPort: 8080
+          urlPath: URL1
+        - name: port2
+          containerPort: 8080
+          urlPath: URL2
+        - name: port3
+          containerPort: 8080
+          urlPath: URL2
+        - name: port4
+          containerPort: 8080
+          urlPath: URL3
+        - name: port5
+          containerPort: 8080
+          urlPath: URL4

@@ -29,17 +29,15 @@ import com.exactpro.th2.validator.model.link.MessageLink;
 import com.exactpro.th2.validator.model.pin.GrpcClientPin;
 import com.exactpro.th2.validator.model.pin.LinkToEndpoint;
 import com.exactpro.th2.validator.model.pin.MqSubscriberPin;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
+import static com.exactpro.th2.validator.util.MapperUtils.MAPPER;
 import static com.exactpro.th2.validator.util.ResourceUtils.collectResources;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNullElse;
 
 public final class LinksValidator {
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private final SchemaValidationContext validationContext;
 
     private final Map<String, Map<String, RepositoryResource>> repositoryMap;
@@ -114,7 +112,7 @@ public final class LinksValidator {
         for (var box : boxes) {
             final String boxName = box.getMetadata().getName();
             try {
-                Th2Spec boxSpec = mapper.convertValue(box.getSpec(), Th2Spec.class);
+                Th2Spec boxSpec = MAPPER.convertValue(box.getSpec(), Th2Spec.class);
 
                 List<MqSubscriberPin> subscribers = requireNonNullElse(
                         boxSpec.getMqSubscribers(), emptyList()

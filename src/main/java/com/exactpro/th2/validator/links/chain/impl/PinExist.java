@@ -21,9 +21,10 @@ import com.exactpro.th2.validator.links.chain.AbstractValidator;
 import com.exactpro.th2.validator.links.ValidationResult;
 import com.exactpro.th2.validator.model.BoxLinkContext;
 import com.exactpro.th2.validator.model.Th2Spec;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Objects;
+
+import static com.exactpro.th2.validator.util.MapperUtils.MAPPER;
 
 public final class PinExist extends AbstractValidator {
 
@@ -38,10 +39,9 @@ public final class PinExist extends AbstractValidator {
         if (!(object instanceof RepositoryResource)) {
             throw new IllegalStateException("Expected target of type Th2CustomResource");
         }
-        ObjectMapper mapper = new ObjectMapper();
         var resource = (RepositoryResource) object;
 
-        Th2Spec spec = mapper.convertValue(resource.getSpec(), Th2Spec.class);
+        Th2Spec spec = MAPPER.convertValue(resource.getSpec(), Th2Spec.class);
         var pin = spec.getPin(pinName);
         if (Objects.nonNull(pin)) {
             return super.validate(pin, additional);
