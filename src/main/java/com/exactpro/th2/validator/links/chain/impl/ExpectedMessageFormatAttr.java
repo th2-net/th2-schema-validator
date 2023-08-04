@@ -24,12 +24,12 @@ import com.exactpro.th2.validator.model.pin.MqPin;
 import com.exactpro.th2.validator.model.Th2Spec;
 import com.exactpro.th2.validator.model.pin.MqPublisherPin;
 import com.exactpro.th2.validator.model.pin.MqSubscriberPin;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.exactpro.th2.validator.util.MapperUtils.MAPPER;
 import static java.lang.String.format;
 
 public class ExpectedMessageFormatAttr extends AbstractValidator {
@@ -40,11 +40,11 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
 
     private final String linkedResourceName;
 
-    private String mainAttributePrefix;
+    private final String mainAttributePrefix;
 
-    private List<String> otherMatchingAttributePrefixes;
+    private final List<String> otherMatchingAttributePrefixes;
 
-    private List<String> contradictingAttributePrefixes;
+    private final List<String> contradictingAttributePrefixes;
 
     public ExpectedMessageFormatAttr(
             BoxLinkContext context,
@@ -91,8 +91,7 @@ public class ExpectedMessageFormatAttr extends AbstractValidator {
 
         String exactAttribute = filteredAttributes.get(0);
 
-        ObjectMapper mapper = new ObjectMapper();
-        Th2Spec linkedResSpec = mapper.convertValue(linkedResource.getSpec(), Th2Spec.class);
+        Th2Spec linkedResSpec = MAPPER.convertValue(linkedResource.getSpec(), Th2Spec.class);
         MqPin linkedPin = linkedResSpec.getMqPin(linkedPinName);
 
         List<String> attributesForLinkedPin = mainPrefixAttributes(linkedPin);

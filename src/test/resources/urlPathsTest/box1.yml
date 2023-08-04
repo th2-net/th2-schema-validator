@@ -5,9 +5,14 @@ metadata:
 spec:
   extendedSettings:
     service:
-      enabled: false
-      ingress:
-        urlPaths:
-          - URL1
-          - URL1
-          - URL2
+      enabled: true
+      clusterIP:
+        - name: port1
+          containerPort: 8080
+          urlPath: URL1
+        - name: port2
+          containerPort: 8080
+          urlPath: URL1
+        - name: port3
+          containerPort: 8080
+          urlPath: URL2

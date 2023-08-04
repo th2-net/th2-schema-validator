@@ -23,10 +23,10 @@ import com.exactpro.th2.validator.links.ValidationResult;
 import com.exactpro.th2.validator.model.*;
 import com.exactpro.th2.validator.model.pin.GrpcClientPin;
 import com.exactpro.th2.validator.model.pin.GrpcServerPin;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Set;
 
+import static com.exactpro.th2.validator.util.MapperUtils.MAPPER;
 import static java.lang.String.format;
 
 public final class ExpectedServiceClass extends AbstractValidator {
@@ -56,8 +56,7 @@ public final class ExpectedServiceClass extends AbstractValidator {
             return ValidationResult.invalid(format("Linked resource: [%s] does not exist", linkedResourceName));
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        Th2Spec linkedResSpec = mapper.convertValue(linkedResource.getSpec(), Th2Spec.class);
+        Th2Spec linkedResSpec = MAPPER.convertValue(linkedResource.getSpec(), Th2Spec.class);
         GrpcServerPin linkedPin = linkedResSpec.getGrpcServerPin(linkedPinName);
 
         if (linkedPin == null) {

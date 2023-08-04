@@ -23,6 +23,7 @@ import com.exactpro.th2.validator.errormessages.BoxResourceErrorMessage;
 import java.util.*;
 
 import static com.exactpro.th2.validator.util.ResourceUtils.getSection;
+import static com.exactpro.th2.validator.util.ResourceUtils.getSectionArray;
 
 class UrlPathsValidator {
 
@@ -90,29 +91,13 @@ class UrlPathsValidator {
                 var spec = (Map<String, Object>) resource.getSpec();
                 Map<String, Object> settings = getSection(spec, "extendedSettings");
                 Map<String, Object> service = getSection(settings, "service");
-                Map<String, Object> ingress = getSection(service, "ingress");
-                if (ingress == null) {
-                    continue;
-                }
 
-                var urls = (List<String>) ingress.get("urlPaths");
-                if (urls == null || urls.isEmpty()) {
-                    continue;
-                }
+                Set<String> allPaths = new HashSet<>();
+                allPaths.addAll(collectSectionPaths(resourceName, getSectionArray(service, "clusterIP")));
+                allPaths.addAll(collectSectionPaths(resourceName, getSectionArray(service, "nodePort")));
+                allPaths.addAll(collectSectionPaths(resourceName, getSectionArray(service, "loadBalancer")));
 
-                Set<String> urlPaths = new HashSet<>();
-                boolean isDuplicated = false;
-
-                for (String url : urls) {
-                    if (!urlPaths.add(url)) {
-                        isDuplicated = true;
-                    }
-                }
-
-                if (isDuplicated) {
-                    ingress.put("urlPaths", new ArrayList<>(urlPaths));
-                }
-                resToUrlPaths.put(resourceName, urlPaths);
+                resToUrlPaths.put(resourceName, allPaths);
 
             } catch (ClassCastException e) {
                 String message = String.format("Exception extracting urlPaths property. exception: %s", e.getMessage());
@@ -127,5 +112,29 @@ class UrlPathsValidator {
         }
 
         return resToUrlPaths;
+    }
+
+    private Set<String> collectSectionPaths(String resourceName, List<Map<String, Object>> ports) {
+        Set<String> urlPaths = new HashSet<>();
+
+        if (ports == null) {
+            return Collections.emptySet();
+        }
+
+        ports.forEach(port -> {
+            String urlPath = (String) port.get("urlPath");
+            if (urlPath != null) {
+                if (!urlPaths.add(urlPath)) {
+                    validationContext.setInvalidResource(resourceName);
+                    validationContext.addBoxResourceErrorMessages(
+                            new BoxResourceErrorMessage(
+                                    resourceName,
+                                    "Contains duplicated url paths"
+                            )
+                    );
+                }
+            }
+        });
+        return urlPaths;
     }
 }
